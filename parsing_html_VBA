@@ -1,4 +1,5 @@
 Sub SortAndColorDates()
+    Dim wsName As String
     Dim ws As Worksheet
     Dim tbl As ListObject
     Dim rng As Range
@@ -8,14 +9,23 @@ Sub SortAndColorDates()
     Dim twoMonthDate As Date
     Dim tableFound As Boolean
     
+    ' Prompt the user for the worksheet name
+    wsName = InputBox("Please enter the name of the worksheet:", "Worksheet Name")
+    
+    ' Check if the user entered a name
+    If wsName = "" Then
+        MsgBox "No worksheet name entered.", vbExclamation
+        Exit Sub
+    End If
+    
     ' Define the worksheet
     On Error Resume Next
-    Set ws = ThisWorkbook.Sheets("NEW")
+    Set ws = ThisWorkbook.Sheets(wsName)
     On Error GoTo 0
     
     ' Check if the worksheet exists
     If ws Is Nothing Then
-        MsgBox "The worksheet 'NEW' does not exist.", vbExclamation
+        MsgBox "The worksheet '" & wsName & "' does not exist.", vbExclamation
         Exit Sub
     End If
 
@@ -28,7 +38,7 @@ Sub SortAndColorDates()
     
     ' Check if a table was found
     If Not tableFound Then
-        MsgBox "No table found on the worksheet 'NEW'.", vbExclamation
+        MsgBox "No table found on the worksheet '" & wsName & "'.", vbExclamation
         Exit Sub
     End If
 
