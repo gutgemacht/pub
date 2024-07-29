@@ -1,69 +1,69 @@
-Sub SortAndColorDates(wsName As String)
+Sub SortAndColorDates()
+    Dim wsName As String
     Dim ws As Worksheet
-    Dim tbl As ListObject
     Dim rng As Range
     Dim cell As Range
     Dim todayDate As Date
     Dim oneMonthDate As Date
     Dim twoMonthDate As Date
-    Dim tableFound As Boolean
+    Dim lastRow As Long
     
-    ' Definieren des Arbeitsblattes
+    ' Prompt the user for the worksheet name
+    wsName = InputBox("Please enter the name of the worksheet:", "Worksheet Name")
+    
+    ' Check if the user entered a name
+    If wsName = "" Then
+        MsgBox "No worksheet name entered.", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Define the worksheet
     On Error Resume Next
     Set ws = ThisWorkbook.Sheets(wsName)
     On Error GoTo 0
     
-    ' Überprüfen, ob das Arbeitsblatt existiert
+    ' Check if the worksheet exists
     If ws Is Nothing Then
-        MsgBox "Das Arbeitsblatt '" & wsName & "' existiert nicht.", vbExclamation
+        MsgBox "The worksheet '" & wsName & "' does not exist.", vbExclamation
         Exit Sub
     End If
-
-    ' Suchen der Tabelle auf dem Arbeitsblatt
-    tableFound = False
-    For Each tbl In ws.ListObjects
-        tableFound = True
-        Exit For
-    Next tbl
     
-    ' Überprüfen, ob eine Tabelle gefunden wurde
-    If Not tableFound Then
-        MsgBox "Keine Tabelle auf dem Arbeitsblatt '" & wsName & "' gefunden.", vbExclamation
-        Exit Sub
-    End If
-
-    ' Sortieren der Tabelle nach Spalte C (Datum)
-    With tbl.Sort
-        .SortFields.Clear
-        .SortFields.Add Key:=tbl.ListColumns("C").Range, SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-        .Header = xlYes
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-
-    ' Definieren der Datumsvariablen
+    ' Confirm worksheet found
+    MsgBox "Worksheet '" & wsName & "' found."
+    
+    ' Find the last row with data in column C
+    lastRow = ws.Cells(ws.Rows.Count, "C").End(xlUp).Row
+    
+    ' Define the range to sort (assuming data starts from row 1)
+    Set rng = ws.Range("A1:C" & lastRow)
+    
+    ' Sort the range by Column C (Date)
+    rng.Sort Key1:=ws.Range("C1"), Order1:=xlAscending, Header:=xlYes
+    
+    ' Define date variables
     todayDate = Date
     oneMonthDate = DateAdd("m", 1, todayDate)
     twoMonthDate = DateAdd("m", 2, todayDate)
 
-    ' Definieren des Datenbereichs in der Tabelle
-    Set rng = tbl.ListColumns("C").DataBodyRange
+    ' Define the range of dates in the column C
+    Set rng = ws.Range("C2:C" & lastRow)
 
-    ' Schleife durch jede Zelle im Bereich
+    ' Loop through each cell in the range
     For Each cell In rng
         If IsDate(cell.Value) Then
             Select Case cell.Value
                 Case Is <= todayDate
-                    cell.Interior.Color = RGB(255, 0, 0) ' Rot
+                    cell.Interior.Color = RGB(255, 0, 0) ' Red
                 Case Is <= oneMonthDate
-                    cell.Interior.Color = RGB(255, 255, 0) ' Gelb
+                    cell.Interior.Color = RGB(255, 255, 0) ' Yellow
                 Case Is <= twoMonthDate
                     cell.Interior.Color = RGB(255, 165, 0) ' Orange
                 Case Else
-                    cell.Interior.Color = RGB(0, 255, 0) ' Grün
+                    cell.Interior.Color = RGB(0, 255, 0) ' Green
             End Select
         End If
     Next cell
+    
+    ' Confirm completion
+    MsgBox "Sorting and coloring completed."
 End Sub
