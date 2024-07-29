@@ -1,1 +1,49 @@
+Sub SortAndColorDates()
+    Dim ws As Worksheet
+    Dim tbl As ListObject
+    Dim rng As Range
+    Dim cell As Range
+    Dim todayDate As Date
+    Dim oneMonthDate As Date
+    Dim twoMonthDate As Date
+    
+    ' Define worksheet and table
+    Set ws = ThisWorkbook.Sheets("NEW")
+    Set tbl = ws.ListObjects(1) ' Assumes there is only one table on the NEW sheet
+    
+    ' Sort the table by Column C (Date)
+    With tbl.Sort
+        .SortFields.Clear
+        .SortFields.Add Key:=tbl.ListColumns("C").Range, SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    ' Define date variables
+    todayDate = Date
+    oneMonthDate = DateAdd("m", 1, todayDate)
+    twoMonthDate = DateAdd("m", 2, todayDate)
+    
+    ' Define the range of dates in the table
+    Set rng = tbl.ListColumns("C").DataBodyRange
+    
+    ' Loop through each cell in the range
+    For Each cell In rng
+        If IsDate(cell.Value) Then
+            Select Case cell.Value
+                Case Is <= todayDate
+                    cell.Interior.Color = RGB(255, 0, 0) ' Red
+                Case Is <= oneMonthDate
+                    cell.Interior.Color = RGB(255, 255, 0) ' Yellow
+                Case Is <= twoMonthDate
+                    cell.Interior.Color = RGB(255, 165, 0) ' Orange
+                Case Else
+                    cell.Interior.Color = RGB(0, 255, 0) ' Green
+            End Select
+        End If
+    Next cell
+End Sub
 
