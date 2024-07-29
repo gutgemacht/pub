@@ -1,4 +1,4 @@
-Sub DeleteColumnsAndSortAndColorDates()
+Sub SortAndColorDates()
     Dim wsName As String
     Dim ws As Worksheet
     Dim rng As Range
@@ -32,24 +32,23 @@ Sub DeleteColumnsAndSortAndColorDates()
     
     ' Confirm worksheet found
     MsgBox "Worksheet '" & wsName & "' found."
-
-    ' Delete columns B and F
-    ws.Columns("B").Delete
-    ws.Columns("E").Delete ' Column E now because after deleting column B, the original F becomes E
     
-    ' Find the last row with data in the new column B
-    lastRow = ws.Cells(ws.Rows.Count, "B").End(xlUp).Row
+    ' Find the last row with data in column C
+    lastRow = ws.Cells(ws.Rows.Count, "C").End(xlUp).Row
     
-    ' Define the range to color and sort (assuming data starts from row 1)
+    ' Define the range to sort (assuming data starts from row 1)
     Set rng = ws.Range("A1:C" & lastRow)
+    
+    ' Sort the range by Column C (Date)
+    rng.Sort Key1:=ws.Range("C1"), Order1:=xlAscending, Header:=xlYes
     
     ' Define date variables
     todayDate = Date
     oneMonthDate = DateAdd("m", 1, todayDate)
     twoMonthDate = DateAdd("m", 2, todayDate)
 
-    ' Define the range of dates in the new column B
-    Set dataRange = ws.Range("B2:B" & lastRow)
+    ' Define the range of dates in the column C
+    Set dataRange = ws.Range("C2:C" & lastRow)
 
     ' Loop through each cell in the range
     For Each cell In dataRange
@@ -66,9 +65,6 @@ Sub DeleteColumnsAndSortAndColorDates()
             End Select
         End If
     Next cell
-    
-    ' Sort the range by the new column B (Date)
-    rng.Sort Key1:=ws.Range("B1"), Order1:=xlAscending, Header:=xlYes
     
     ' Set font to Courier New, size 11
     rng.Font.Name = "Courier New"
@@ -91,5 +87,5 @@ Sub DeleteColumnsAndSortAndColorDates()
     End With
     
     ' Confirm completion
-    MsgBox "Deleting columns, coloring, sorting, and formatting completed."
+    MsgBox "Sorting, coloring, and formatting completed."
 End Sub
