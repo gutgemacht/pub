@@ -1,0 +1,25 @@
+Private Sub UserForm_Initialize()
+    Dim ws As Worksheet
+    
+    ' ComboBox mit Arbeitsblattnamen füllen
+    For Each ws In ThisWorkbook.Worksheets
+        Me.cmbWorksheets.AddItem ws.Name
+    Next ws
+End Sub
+
+Private Sub btnProcess_Click()
+    Dim selectedSheet As String
+    selectedSheet = Me.cmbWorksheets.Value
+    
+    ' Überprüfen, ob ein Arbeitsblatt ausgewählt wurde
+    If selectedSheet = "" Then
+        MsgBox "Bitte wählen Sie ein Arbeitsblatt aus.", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Aufruf der SortAndColorDates-Prozedur mit dem ausgewählten Arbeitsblattnamen
+    SortAndColorDates selectedSheet
+    
+    ' Schließen des Benutzerformulars
+    Unload Me
+End Sub
