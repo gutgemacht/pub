@@ -7,9 +7,7 @@ Sub SortAndColorDates()
     Dim oneMonthDate As Date
     Dim twoMonthDate As Date
     Dim lastRow As Long
-    Dim headerRange As Range
-    Dim dataRange As Range
-
+    
     ' Prompt the user for the worksheet name
     wsName = InputBox("Please enter the name of the worksheet:", "Worksheet Name")
     
@@ -48,10 +46,10 @@ Sub SortAndColorDates()
     twoMonthDate = DateAdd("m", 2, todayDate)
 
     ' Define the range of dates in the column C
-    Set dataRange = ws.Range("C2:C" & lastRow)
+    Set rng = ws.Range("C2:C" & lastRow)
 
     ' Loop through each cell in the range
-    For Each cell In dataRange
+    For Each cell In rng
         If IsDate(cell.Value) Then
             Select Case cell.Value
                 Case Is <= todayDate
@@ -66,26 +64,6 @@ Sub SortAndColorDates()
         End If
     Next cell
     
-    ' Set font to Courier New, size 11
-    rng.Font.Name = "Courier New"
-    rng.Font.Size = 11
-    
-    ' Draw borders around the table
-    With rng.Borders
-        .LineStyle = xlContinuous
-        .ColorIndex = 0
-        .TintAndShade = 0
-        .Weight = xlThin
-    End With
-    
-    ' Format the header row
-    Set headerRange = ws.Range("A1:C1")
-    With headerRange
-        .Interior.Color = RGB(192, 192, 192) ' Gray
-        .Font.Bold = True
-        .Font.Size = 12
-    End With
-    
     ' Confirm completion
-    MsgBox "Sorting, coloring, and formatting completed."
+    MsgBox "Sorting and coloring completed."
 End Sub
