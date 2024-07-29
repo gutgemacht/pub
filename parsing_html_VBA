@@ -6,11 +6,32 @@ Sub SortAndColorDates()
     Dim todayDate As Date
     Dim oneMonthDate As Date
     Dim twoMonthDate As Date
+    Dim tableFound As Boolean
     
-    ' Define worksheet and table
+    ' Define the worksheet
+    On Error Resume Next
     Set ws = ThisWorkbook.Sheets("NEW")
-    Set tbl = ws.ListObjects(1) ' Assumes there is only one table on the NEW sheet
+    On Error GoTo 0
     
+    ' Check if the worksheet exists
+    If ws Is Nothing Then
+        MsgBox "The worksheet 'NEW' does not exist.", vbExclamation
+        Exit Sub
+    End If
+
+    ' Search for the table on the worksheet
+    tableFound = False
+    For Each tbl In ws.ListObjects
+        tableFound = True
+        Exit For
+    Next tbl
+    
+    ' Check if a table was found
+    If Not tableFound Then
+        MsgBox "No table found on the worksheet 'NEW'.", vbExclamation
+        Exit Sub
+    End If
+
     ' Sort the table by Column C (Date)
     With tbl.Sort
         .SortFields.Clear
@@ -21,15 +42,15 @@ Sub SortAndColorDates()
         .SortMethod = xlPinYin
         .Apply
     End With
-    
+
     ' Define date variables
     todayDate = Date
     oneMonthDate = DateAdd("m", 1, todayDate)
     twoMonthDate = DateAdd("m", 2, todayDate)
-    
+
     ' Define the range of dates in the table
     Set rng = tbl.ListColumns("C").DataBodyRange
-    
+
     ' Loop through each cell in the range
     For Each cell In rng
         If IsDate(cell.Value) Then
@@ -46,4 +67,3 @@ Sub SortAndColorDates()
         End If
     Next cell
 End Sub
-
