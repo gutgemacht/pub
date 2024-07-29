@@ -1,23 +1,15 @@
 Sub SortAndColorDates()
     Dim wsName As String
     Dim ws As Worksheet
-    Dim tbl As ListObject
     Dim rng As Range
     Dim cell As Range
     Dim todayDate As Date
     Dim oneMonthDate As Date
     Dim twoMonthDate As Date
-    Dim tableFound As Boolean
-    Dim allSheets As String
-    Dim sheet As Worksheet
-    
-    ' List all worksheets
-    allSheets = ""
-    For Each sheet In ThisWorkbook.Sheets
-        allSheets = allSheets & sheet.Name & vbCrLf
-    Next sheet
-    MsgBox "Available worksheets are:" & vbCrLf & allSheets
-    
+    Dim lastRow As Long
+    Dim headerRange As Range
+    Dim dataRange As Range
+
     ' Prompt the user for the worksheet name
     wsName = InputBox("Please enter the name of the worksheet:", "Worksheet Name")
     
@@ -40,44 +32,26 @@ Sub SortAndColorDates()
     
     ' Confirm worksheet found
     MsgBox "Worksheet '" & wsName & "' found."
-
-    ' Search for the table on the worksheet
-    tableFound = False
-    For Each tbl In ws.ListObjects
-        tableFound = True
-        Exit For
-    Next tbl
     
-    ' Check if a table was found
-    If Not tableFound Then
-        MsgBox "No table found on the worksheet '" & wsName & "'.", vbExclamation
-        Exit Sub
-    End If
+    ' Find the last row with data in column C
+    lastRow = ws.Cells(ws.Rows.Count, "C").End(xlUp).Row
     
-    ' Confirm table found
-    MsgBox "Table found on the worksheet '" & wsName & "'."
-
-    ' Sort the table by Column C (Date)
-    With tbl.Sort
-        .SortFields.Clear
-        .SortFields.Add Key:=tbl.ListColumns("C").Range, SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-        .Header = xlYes
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-
+    ' Define the range to sort (assuming data starts from row 1)
+    Set rng = ws.Range("A1:C" & lastRow)
+    
+    ' Sort the range by Column C (Date)
+    rng.Sort Key1:=ws.Range("C1"), Order1:=xlAscending, Header:=xlYes
+    
     ' Define date variables
     todayDate = Date
     oneMonthDate = DateAdd("m", 1, todayDate)
     twoMonthDate = DateAdd("m", 2, todayDate)
 
-    ' Define the range of dates in the table
-    Set rng = tbl.ListColumns("C").DataBodyRange
+    ' Define the range of dates in the column C
+    Set dataRange = ws.Range("C2:C" & lastRow)
 
     ' Loop through each cell in the range
-    For Each cell In rng
+    For Each cell In dataRange
         If IsDate(cell.Value) Then
             Select Case cell.Value
                 Case Is <= todayDate
@@ -92,6 +66,26 @@ Sub SortAndColorDates()
         End If
     Next cell
     
+    ' Set font to Courier New, size 11
+    rng.Font.Name = "Courier New"
+    rng.Font.Size = 11
+    
+    ' Draw borders around the table
+    With rng.Borders
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    
+    ' Format the header row
+    Set headerRange = ws.Range("A1:C1")
+    With headerRange
+        .Interior.Color = RGB(192, 192, 192) ' Gray
+        .Font.Bold = True
+        .Font.Size = 12
+    End With
+    
     ' Confirm completion
-    MsgBox "Sorting and coloring completed."
+    MsgBox "Sorting, coloring, and formatting completed."
 End Sub
