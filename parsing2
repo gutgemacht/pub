@@ -1,0 +1,72 @@
+Sub SortAndColorDates()
+    Dim ws As Worksheet
+    Dim tbl As ListObject
+    Dim rng As Range
+    Dim cell As Range
+    Dim todayDate As Date
+    Dim oneMonthDate As Date
+    Dim twoMonthDate As Date
+    Dim tableExists As Boolean
+    Dim tblIndex As Integer
+    
+    ' Initialize variables
+    tableExists = False
+    tblIndex = 1 ' Adjust this if your table is not the first table on the sheet
+
+    ' Define the worksheet
+    On Error Resume Next
+    Set ws = ThisWorkbook.Sheets("NEW")
+    On Error GoTo 0
+    
+    ' Check if the worksheet exists
+    If ws Is Nothing Then
+        MsgBox "The worksheet 'NEW' does not exist.", vbExclamation
+        Exit Sub
+    End If
+
+    ' Find the table on the worksheet
+    On Error Resume Next
+    Set tbl = ws.ListObjects(tblIndex)
+    On Error GoTo 0
+
+    ' Check if the table exists
+    If tbl Is Nothing Then
+        MsgBox "No table found on the worksheet 'NEW'.", vbExclamation
+        Exit Sub
+    End If
+
+    ' Sort the table by Column C (Date)
+    With tbl.Sort
+        .SortFields.Clear
+        .SortFields.Add Key:=tbl.ListColumns("C").Range, SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+
+    ' Define date variables
+    todayDate = Date
+    oneMonthDate = DateAdd("m", 1, todayDate)
+    twoMonthDate = DateAdd("m", 2, todayDate)
+
+    ' Define the range of dates in the table
+    Set rng = tbl.ListColumns("C").DataBodyRange
+
+    ' Loop through each cell in the range
+    For Each cell In rng
+        If IsDate(cell.Value) Then
+            Select Case cell.Value
+                Case Is <= todayDate
+                    cell.Interior.Color = RGB(255, 0, 0) ' Red
+                Case Is <= oneMonthDate
+                    cell.Interior.Color = RGB(255, 255, 0) ' Yellow
+                Case Is <= twoMonthDate
+                    cell.Interior.Color = RGB(255, 165, 0) ' Orange
+                Case Else
+                    cell.Interior.Color = RGB(0, 255, 0) ' Green
+            End Select
+        End If
+    Next cell
+End Sub
