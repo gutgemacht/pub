@@ -32,6 +32,10 @@ Sub SortAndColorDates()
     
     ' Confirm worksheet found
     MsgBox "Worksheet '" & wsName & "' found."
+
+    ' Delete columns B and F
+    ws.Columns("B").Delete
+    ws.Columns("E").Delete ' Column E now because after deleting column B, the original F becomes E
     
     ' Find the last row with data in column C
     lastRow = ws.Cells(ws.Rows.Count, "C").End(xlUp).Row
