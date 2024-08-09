@@ -1,2 +1,13 @@
+CREATE REMOTE SOURCE BIGQUERY_SOURCE ADAPTER "jdbc" AT LOCATION 'dpagenthost:dpagentport'
+CONFIGURATION '{
     "driver": "com.simba.googlebigquery.jdbc42.Driver",
-    "JDBC_DRIVER_LOC": "/path/to/simba-bigquery-driver.jar"
+    "url": "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=<your-project-id>;OAuthMechanism=1;ClientId=<your-client-id>;ClientSecret=<your-client-secret>;Catalog=<your-catalog>;ProxyHost=<your-proxy-host>;ProxyPort=<your-proxy-port>;TrustedCerts=<path-to-trusted-cert>"
+}'
+WITH CREDENTIAL TYPE 'PASSWORD'
+USING 'user=<your-username>;password=<your-password>';
+
+
+
+
+[JDBCDrivers]
+BigQueryDriver=com.simba.googlebigquery.jdbc42.Driver|lib/simba-bigquery-driver.jar
