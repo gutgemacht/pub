@@ -1,13 +1,12 @@
-CREATE REMOTE SOURCE BIGQUERY_SOURCE ADAPTER "jdbc" AT LOCATION 'dpagenthost:dpagentport'
-CONFIGURATION '{
-    "driver": "com.simba.googlebigquery.jdbc42.Driver",
-    "url": "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=<your-project-id>;OAuthMechanism=1;ClientId=<your-client-id>;ClientSecret=<your-client-secret>;Catalog=<your-catalog>;ProxyHost=<your-proxy-host>;ProxyPort=<your-proxy-port>;TrustedCerts=<path-to-trusted-cert>"
-}'
-WITH CREDENTIAL TYPE 'PASSWORD'
-USING 'user=<your-username>;password=<your-password>';
+IMPORT FROM CSV FILE '<file_directory>' INTO "<schema_name>"."<table_name>"
+WITH RECORD DELIMITED BY '\n'
+FIELD DELIMITED BY ','
+OPTIONALLY ENCLOSED BY '"'
+ERROR LOG 'error_log_directory';
 
 
-
-
-[JDBCDrivers]
-BigQueryDriver=com.simba.googlebigquery.jdbc42.Driver|lib/simba-bigquery-driver.jar
+IMPORT FROM CSV FILE '/usr/sap/hana/shared/import/my_table.csv' INTO "MY_SCHEMA"."MY_TABLE"
+WITH RECORD DELIMITED BY '\n'
+FIELD DELIMITED BY ','
+OPTIONALLY ENCLOSED BY '"'
+ERROR LOG '/usr/sap/hana/shared/import/error_log';
