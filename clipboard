@@ -1,12 +1,6 @@
-IMPORT FROM CSV FILE '<file_directory>' INTO "<schema_name>"."<table_name>"
-WITH RECORD DELIMITED BY '\n'
-FIELD DELIMITED BY ','
-OPTIONALLY ENCLOSED BY '"'
-ERROR LOG 'error_log_directory';
+SELECT ENTRY_ID, ENTRY_TYPE_NAME, ENTRY_STATE_NAME, SIZE, START_TIME, COMMENT 
+FROM SYS.M_BACKUP_CATALOG 
+WHERE ENTRY_TYPE_NAME = 'fallback snapshot';
 
 
-IMPORT FROM CSV FILE '/usr/sap/hana/shared/import/my_table.csv' INTO "MY_SCHEMA"."MY_TABLE"
-WITH RECORD DELIMITED BY '\n'
-FIELD DELIMITED BY ','
-OPTIONALLY ENCLOSED BY '"'
-ERROR LOG '/usr/sap/hana/shared/import/error_log';
+du -sh /hana/shared/<SID>/backup/data/<fallback_snapshot_directory>
