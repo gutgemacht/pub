@@ -1,6 +1,16 @@
-SELECT ENTRY_ID, ENTRY_TYPE_NAME, ENTRY_STATE_NAME, SIZE, START_TIME, COMMENT 
-FROM SYS.M_BACKUP_CATALOG 
-WHERE ENTRY_TYPE_NAME = 'fallback snapshot';
+DO
+BEGIN
+    DECLARE user_name VARCHAR(256);
 
+    FOR user_cursor AS
+        SELECT USER_NAME
+        FROM SYS.USERS
+        WHERE USER_NAME NOT IN ('SYSTEM', 'SIDADM', 'USER1', 'USER2') -- Add any users you want to exclude from locking here
+    DO
+        EXEC 'ALTER USER ' || :user_cursor.USER_NAME || ' DISABLE USER';
+    END FOR;
+END;
 
-du -sh /hana/shared/<SID>/backup/data/<fallback_snapshot_directory>
+SELECT USER_NAME, USER_DEACTIVATED
+FROM SYS.USERS
+ORDER BY USER_NAME;
