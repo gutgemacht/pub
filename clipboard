@@ -27,3 +27,46 @@ STUST tables:
 - **VSTRUST**
 - **SSFRPSEACLS**
 - **TSSCAN**
+
+
+
+#!/bin/bash
+
+# Define an array of hosts
+hosts=("host1.example.com" "host2.example.com" "host3.example.com")
+
+# Function to ping a host
+ping_host() {
+    local host=$1
+    echo "Pinging $host..."
+    if ping -c 1 -W 1 "$host" &> /dev/null; then
+        echo "$host is reachable."
+        return 0
+    else
+        echo "$host is not reachable."
+        return 1
+    fi
+}
+
+# Function to execute remote commands via SSH
+execute_remote_commands() {
+    local host=$1
+    ssh user@"$host" << 'EOF'
+        echo "Executing commands on remote host $(hostname)"
+        uptime
+        df -h
+        # Add more commands here as needed
+EOF
+}
+
+# Main function to loop through the hosts
+main() {
+    for host in "${hosts[@]}"; do
+        if ping_host "$host"; then
+            execute_remote_commands "$host"
+        fi
+    done
+}
+
+# Run the main function
+main
