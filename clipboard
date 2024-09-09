@@ -1,72 +1,19 @@
-DO
-BEGIN
-    DECLARE user_name VARCHAR(256);
-
-    FOR user_cursor AS
-        SELECT USER_NAME
-        FROM SYS.USERS
-        WHERE USER_NAME NOT IN ('SYSTEM', 'SIDADM', 'USER1', 'USER2') -- Add any users you want to exclude from locking here
-    DO
-        EXEC 'ALTER USER ' || :user_cursor.USER_NAME || ' DISABLE USER';
-    END FOR;
-END;
-
-SELECT USER_NAME, USER_DEACTIVATED
-FROM SYS.USERS
-ORDER BY USER_NAME;
-
-
-STUST tables:
-
-- **SSLCERT**
-- **SSLCERTREPOSITORY**
-- **SSFRNODES**
-- **SSFRNODREFS**
-- **SSFRPSE**
-- **SSFRIDENTITY**
-- **VSTRUST**
-- **SSFRPSEACLS**
-- **TSSCAN**
-
-
-
 #!/bin/bash
 
-# Define an array of hosts
-hosts=("host1.example.com" "host2.example.com" "host3.example.com")
+# Step 1: Declare an array
+my_array=(one two three four)
 
-# Function to ping a host
-ping_host() {
-    local host=$1
-    echo "Pinging $host..."
-    if ping -c 1 -W 1 "$host" &> /dev/null; then
-        echo "$host is reachable."
-        return 0
-    else
-        echo "$host is not reachable."
-        return 1
-    fi
-}
+# Step 2: Function to accept the array name as a parameter
+iterate_array() {
+    local array_name=$1 # Get the array name passed as an argument
+    local array_length=$(eval echo \${#${array_name}[@]}) # Get the array length
 
-# Function to execute remote commands via SSH
-execute_remote_commands() {
-    local host=$1
-    ssh user@"$host" << 'EOF'
-        echo "Executing commands on remote host $(hostname)"
-        uptime
-        df -h
-        # Add more commands here as needed
-EOF
-}
-
-# Main function to loop through the hosts
-main() {
-    for host in "${hosts[@]}"; do
-        if ping_host "$host"; then
-            execute_remote_commands "$host"
-        fi
+    # Step 3: Use indirect expansion to iterate through the array
+    for ((i=0; i<array_length; i++)); do
+        element=$(eval echo \${${array_name}[$i]}) # Access each element of the array
+        echo "Element $i: $element"
     done
 }
 
-# Run the main function
-main
+# Call the function and pass the name of the array
+iterate_array my_array
