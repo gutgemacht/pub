@@ -1,1 +1,13 @@
-=IF(A1="Yes", "Approved", "")
+Sub CopyCellContent()
+    ' Copies content from cell A1
+    Range("A1").Copy
+    
+    ' Change the button text to "Copied"
+    ActiveSheet.Buttons(Application.Caller).Caption = "Copied"
+    
+    ' Optional: Add a delay to change it back to "Copy" after a few seconds
+    Application.Wait (Now + TimeValue("0:00:02")) ' Wait for 2 seconds
+    
+    ' Change the button text back to "Copy"
+    ActiveSheet.Buttons(Application.Caller).Caption = "Copy"
+End Sub
