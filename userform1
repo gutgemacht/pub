@@ -16,3 +16,4 @@ End Sub
 sed -i 's/\"\/usr\/sap\/sapservices\"/\"\/usr\/sap\/sapservices\/sapservices\"/g' file1
 
 sed -i '' '/^install$/s/^/#/g; /^prepare_install$/s/^/#/g' file1
+sed -i 's|SAPSERVICE_PATH=\${USRSAP}/sapservices|SAPSERVICE_PATH=\${USRSAP}/sapservices/sapservices|g' file1
