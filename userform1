@@ -11,3 +11,6 @@ Sub CopyCellContent()
     ' Change the button text back to "Copy"
     ActiveSheet.Buttons(Application.Caller).Caption = "Copy"
 End Sub
+
+
+sed -i 's/\"\/usr\/sap\/sapservices\"/\"\/usr\/sap\/sapservices\/sapservices\"/g' file1
