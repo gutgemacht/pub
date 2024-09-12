@@ -6,6 +6,20 @@ Sub CheckBoxCopyText()
     
     ' Check if the checkbox is checked
     If chkBox.Value = 1 Then
+        ' Copy the text from cell A13 to B13
+        Range("B13").Value = Range("A13").Value
+    End If
+End Sub 
+
+
+Bbbb
+Sub CheckBoxCopyText()
+    ' Define the checkbox (Form Control)
+    Dim chkBox As CheckBox
+    Set chkBox = ActiveSheet.CheckBoxes(Application.Caller)
+    
+    ' Check if the checkbox is checked
+    If chkBox.Value = 1 Then
         ' Copy the text from cell A1 to B1 (adjust these cell references as needed)
         Range("B1").Value = Range("A1").Value
     Else
