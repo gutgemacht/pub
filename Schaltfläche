@@ -1,3 +1,38 @@
-Sub ShowWorksheetSelectionForm()
-    WorksheetSelectionForm.Show
+
+Sub CopyAndChangeButton()
+    ' Define the button
+    Dim btn As Button
+    Set btn = ActiveSheet.Buttons(Application.Caller)
+    
+    ' Define the text to be copied
+    Dim textToCopy As String
+    textToCopy = "Your text to be copied" ' Replace this with the actual text to copy
+    
+    ' Copy text to clipboard
+    Dim DataObj As New MSForms.DataObject
+    DataObj.SetText textToCopy
+    DataObj.PutInClipboard
+    
+    ' Change the button caption to "Copied"
+    btn.Caption = "Copied"
+    
+    ' Change the button color to green
+    btn.Font.Color = RGB(255, 255, 255) ' Change the text color to white
+    btn.BackColor = RGB(0, 255, 0) ' Green background
+    
+    ' Wait for 60 seconds
+    Application.OnTime Now + TimeValue("00:01:00"), "ResetButton"
+End Sub
+
+Sub ResetButton()
+    ' Define the button again
+    Dim btn As Button
+    Set btn = ActiveSheet.Buttons("Button 1") ' Replace "Button 1" with the actual button name if different
+    
+    ' Reset the button caption back to the original text
+    btn.Caption = "Your text to be copied" ' Replace with original button text
+    
+    ' Reset the button color back to default
+    btn.Font.Color = RGB(0, 0, 0) ' Black text color
+    btn.BackColor = RGB(255, 255, 255) ' White background
 End Sub
