@@ -1,4 +1,19 @@
 
+Sub CheckBoxCopyToClipboard()
+    ' Define the checkbox (Form Control)
+    Dim chkBox As CheckBox
+    Set chkBox = ActiveSheet.CheckBoxes(Application.Caller)
+    
+    ' If the checkbox is checked, copy the content of A13 to the clipboard
+    If chkBox.Value = 1 Then
+        ' Copy the content of cell A13 to the clipboard
+        Dim DataObj As New MSForms.DataObject
+        DataObj.SetText Range("A13").Value
+        DataObj.PutInClipboard
+    End If
+End Sub 
+
+Vvv
 Sub CheckBoxCopyText()
     ' Define the checkbox (Form Control)
     Dim chkBox As CheckBox
