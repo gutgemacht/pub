@@ -1,40 +1,30 @@
-export SAPABAP1.P_PSE_CERTIFICATES_ AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSPCPROCESSLOG AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.P_CERTIFICATES_ AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.USRCERTRULE AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.MASSFLDLST AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSDMTD_CLASSFREQ AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.USRCERTRULEMIG AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.MASSFLDPRP AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.MASSFUNC AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.CREP_CERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.STRUSTCERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.STRUSTSSL AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.STRUSTSSLS AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.STRUSTSSLST AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.STRUSTSSLT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.WDR_ACF_WL_CERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.TCCERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.USRCERTMAP AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFAPPLICT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFARGS AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFVARGS AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFVARGST AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFVKEYDEF AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSF_PSE_D AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSF_PSE_H AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSF_PSE_HIST AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSF_PSE_L AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSF_PSE_T AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSSFMSSGRP AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSSFMSSVAR AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFSET AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFXSFBMP AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFXSFCSS AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFOBJSCR AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSSFMSSREP AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.RSSFMSSUSR AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.TILM_STOR_CERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.BDS_CLASSL AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.XI_SEC_CERT AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
-export SAPABAP1.SSFAPPLIC AS BINARY INTO/usr/sap/HA1/home/STRUST with replace threads 4;
+Sub CreateBlocksWithVariable()
+    Dim sourceCell As Range
+    Dim values As Variant
+    Dim i As Long
+    Dim lastRow As Long
+    Dim blockStartRow As Long
+    Dim blockCount As Long ' Variable to store the number of blocks
+    
+    ' Set the cell with the source values
+    Set sourceCell = Range("A1") ' Change this to the cell you need
+
+    ' Split the values in the cell into an array by comma
+    values = Split(sourceCell.Value, ",")
+    
+    ' Determine the number of blocks
+    blockCount = UBound(values) - LBound(values) + 1
+
+    ' Determine the last row to insert blocks
+    lastRow = Cells(Rows.Count, "B").End(xlUp).Row
+    blockStartRow = lastRow + 1
+    
+    ' Loop through each value and create blocks
+    For i = LBound(values) To UBound(values)
+        ' Write the value into column B
+        Cells(blockStartRow + i, 2).Value = Trim(values(i))
+    Next i
+    
+    ' Display the variable with the number of blocks
+    MsgBox "Number of blocks: " & blockCount
+End Sub
