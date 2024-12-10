@@ -1,43 +1,35 @@
-#!/bin/bash
+Your email is well-written, but I will provide some corrections and suggestions for better clarity and professionalism:
 
-# Configurable variables
-INPUT_FILE="/path/to/your/input/file" # Replace with the file path to check
-ENCRYPTED_DIR="/path/to/encrypted"    # Replace with the directory for encrypted files
-ARCHIVE_DIR="/path/to/archive"        # Replace with the directory for archived files
-PGP_RECIPIENT="recipient@example.com" # Replace with the recipient for encryption
 
-# Check if the input file exists
-if [ ! -f "$INPUT_FILE" ]; then
-  echo "No file found."
-  exit 1
-fi
+---
 
-# Encrypt the file using GPG
-gpg --output "$ENCRYPTED_DIR/$(basename "$INPUT_FILE").gpg" --encrypt --recipient "$PGP_RECIPIENT" "$INPUT_FILE"
-if [ $? -eq 0 ]; then
-  echo "Encryption successful."
+Subject: Follow-Up: Lumira Memory Overflow Investigation
 
-  # Move the original file to the archive directory
-  mv "$INPUT_FILE" "$ARCHIVE_DIR/"
-  if [ $? -eq 0 ]; then
-    echo "Original file moved to archive."
-  else
-    echo "Failed to move the original file to archive."
-    exit 1
-  fi
 
-  # Return encrypted message
-  echo "encrypted"
-else
-  echo "Encryption failed."
-  exit 1
-fi
+I would like to summarize and compile all the investigations from the Basis side over the past weeks and include the results in this email to determine which direction we should take next regarding the "Lumira Memory Overflow" issue.
 
-# Delete files older than 1 month in the archive directory
-find "$ARCHIVE_DIR" -type f -mtime +30 -exec rm -f {} \;
-if [ $? -eq 0 ]; then
-  echo "Old files deleted from archive."
-else
-  echo "Failed to delete old files from archive."
-  exit 1
-fi
+As you know, after increasing and adjusting the JVM parameters (Initial memory size: 20-25 GB; Max memory size: 40-50 GB) on 04.12.2024, the current memory usage is about 34 GB. Therefore, no GC run was triggered since the restart.
+
+However, if the memory is being heavily utilized due to high memory-consuming activities, the garbage collector will still not be able to release the residual memory. Adding more memory to the server or deploying new Lumira nodes will not ensure stable operation, as the memory will continue to fill up, leading to Memory Overflow issues.
+
+Possible Causes:
+
+1. One or more high memory-consuming reports allocate the entire available memory on the Lumira server before the GC can initiate memory release.
+
+
+2. One or more high memory-consuming reports retain allocated memory due to active sessions, while other reports allocate the remaining free memory.
+
+
+
+Could you please investigate (and share with us) the reports currently running on your side to help locate the most memory-intensive reports or jobs? These reports need to be adjusted to release their sessions after completion, allowing the GC to mark these memory segments for cleanup in the next run.
+
+Thank you in advance for your support. Please let us know if further details are required from our side.
+
+Best regards,
+[Your Name]
+
+
+---
+
+This version adjusts grammar, enhances flow, and ensures clear communication. Let me know if further changes are needed!
+
