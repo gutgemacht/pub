@@ -1,1 +1,6 @@
-=IF(ISBLANK(B3),"",LEN(TRIM(B3))-LEN(SUBSTITUTE(TRIM(B3),",",""))+1)
+Betreff: Anfrage zur API-Dokumentation für das Ticketing-System
+Sehr geehrte Damen und Herren,
+ich nutze Ihr Ticketing-System und habe festgestellt, dass die manuelle Eingabe von Daten für jeden einzelnen Ticketvorgang sehr zeitaufwendig ist. Da die meisten der benötigten Informationen in den Tickets gleich bleiben, würde ich gerne die Erstellung der Tickets automatisieren.
+Daher möchte ich anfragen, ob es eine API gibt, die diesen Prozess unterstützt, und ob Sie mir die entsprechende Dokumentation zur Verfügung stellen können. Leider ist es mir nicht gelungen, die passende API-Dokumentation in Ihrem Katalog zu identifizieren, da die Bezeichnungen der APIs nicht eindeutig auf die Funktion zur Ticket-Erstellung hinweisen.
+Falls die API-Dokumentation nicht öffentlich zugänglich ist, bitte ich Sie, mir die notwendigen Informationen oder Hinweise zukommen zu lassen, um die API für die Ticket-Erstellung nutzen zu können.
+Vielen Dank im Voraus für Ihre Unterstützung!
