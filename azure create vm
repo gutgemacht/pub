@@ -1,0 +1,146 @@
+PS:
+# Connect to your Azure account
+Connect-AzAccount
+
+# Variables
+$resourceGroupName = "MyResourceGroup"
+$location = "EastUS"
+$vmName = "MyVM"
+$image = "Win2022Datacenter"  # Example: Windows Server 2022 Datacenter
+$size = "Standard_DS1_v2"     # VM size
+
+# Create a Resource Group
+New-AzResourceGroup -Name $resourceGroupName -Location $location
+
+# Create a Virtual Network and Subnet
+$vnet = New-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Location $location -Name "MyVNet" -AddressPrefix "10.0.0.0/16"
+$subnet = Add-AzVirtualNetworkSubnetConfig -Name "MySubnet" -AddressPrefix "10.0.0.0/24" -VirtualNetwork $vnet
+$vnet | Set-AzVirtualNetwork
+
+# Create a Public IP Address
+$publicIP = New-AzPublicIpAddress -ResourceGroupName $resourceGroupName -Location $location -Name "MyPublicIP" -AllocationMethod Dynamic
+
+# Create a Network Security Group
+$nsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "MyNSG"
+
+# Create a Network Interface
+$nic = New-AzNetworkInterface -ResourceGroupName $resourceGroupName -Location $location -Name "MyNIC" -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $publicIP.Id -NetworkSecurityGroupId $nsg.Id
+
+# Create the VM Configuration
+$vmConfig = New-AzVMConfig -VMName $vmName -VMSize $size |
+    Set-AzVMOperatingSystem -Windows -ComputerName $vmName -Credential (Get-Credential) |
+    Set-AzVMSourceImage -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer" -Skus $image -Version "latest" |
+    Add-AzVMNetworkInterface -Id $nic.Id
+
+# Create the VM
+New-AzVM -ResourceGroupName $resourceGroupName -Location $location -VM $vmConfig
+
+
+
+CLI:
+# Log in to your Azure account
+az login
+
+# Define variables
+RESOURCE_GROUP="MyResourceGroup"
+LOCATION="EastUS"
+VM_NAME="MyVM"
+IMAGE="Win2022Datacenter"  # Example: Windows Server 2022 Datacenter
+SIZE="Standard_DS1_v2"     # VM size
+ADMIN_USERNAME="azureuser"
+ADMIN_PASSWORD="P@ssw0rd1234!"  # Replace with a strong password
+
+# Create a Resource Group
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+# Create the VM
+az vm create \
+  --resource-group $RESOURCE_GROUP \
+  --name $VM_NAME \
+  --image $IMAGE \
+  --size $SIZE \
+  --admin-username $ADMIN_USERNAME \
+  --admin-password $ADMIN_PASSWORD
+
+
+
+TF:
+# Configure the Azure provider
+provider "azurerm" {
+  features {}
+}
+
+# Create a Resource Group
+resource "azurerm_resource_group" "example" {
+  name     = "MyResourceGroup"
+  location = "EastUS"
+}
+
+# Create a Virtual Network
+resource "azurerm_virtual_network" "example" {
+  name                = "MyVNet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Create a Subnet
+resource "azurerm_subnet" "example" {
+  name                 = "MySubnet"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.0.0/24"]
+}
+
+# Create a Public IP Address
+resource "azurerm_public_ip" "example" {
+  name                = "MyPublicIP"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Dynamic"
+}
+
+# Create a Network Security Group
+resource "azurerm_network_security_group" "example" {
+  name                = "MyNSG"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Create a Network Interface
+resource "azurerm_network_interface" "example" {
+  name                = "MyNIC"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  ip_configuration {
+    name                          = "MyIPConfig"
+    subnet_id                     = azurerm_subnet.example.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.example.id
+  }
+}
+
+# Create the Virtual Machine
+resource "azurerm_windows_virtual_machine" "example" {
+  name                = "MyVM"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  size                = "Standard_DS1_v2" # VM size
+  admin_username      = "azureuser"
+  admin_password      = "P@ssw0rd1234!" # Replace with a strong password
+
+  network_interface_ids = [azurerm_network_interface.example.id]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2022-Datacenter"
+    version   = "latest"
+  }
+}
