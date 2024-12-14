@@ -1,19 +1,34 @@
-Sub CopyCellContent()
-    ' Copies content from cell A1
-    Range("A1").Copy
-    
-    ' Change the button text to "Copied"
-    ActiveSheet.Buttons(Application.Caller).Caption = "Copied"
-    
-    ' Optional: Add a delay to change it back to "Copy" after a few seconds
-    Application.Wait (Now + TimeValue("0:00:02")) ' Wait for 2 seconds
-    
-    ' Change the button text back to "Copy"
-    ActiveSheet.Buttons(Application.Caller).Caption = "Copy"
-End Sub
+Ressource Group creation
+
+PS:
+# Log in to your Azure account
+az login
+
+# Define variables
+$resourceGroupName = "MyResourceGroup"
+$location = "EastUS"
+
+# Create the resource group
+az group create --name $resourceGroupName --location $location
 
 
-sed -i 's/\"\/usr\/sap\/sapservices\"/\"\/usr\/sap\/sapservices\/sapservices\"/g' file1
+CLI:
 
-sed -i '' '/^install$/s/^/#/g; /^prepare_install$/s/^/#/g' file1
-sed -i 's|SAPSERVICE_PATH=\${USRSAP}/sapservices|SAPSERVICE_PATH=\${USRSAP}/sapservices/sapservices|g' file1
+
+TF:
+provider "azurerm" {
+  features {}
+}
+
+variable "resource_group_name" {
+  default = "MyResourceGroup"
+}
+
+variable "location" {
+  default = "EastUS"
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = var.resource_group_name
+  location = var.location
+}
