@@ -1,18 +1,10 @@
 Ressource Group creation
 
 PS:
-# Log in to your Azure account
-az login
-
-# Define variables
-$resourceGroupName = "MyResourceGroup"
-$location = "EastUS"
-
-# Create the resource group
-az group create --name $resourceGroupName --location $location
-
+New-AzResourceGroup -Name "MyResourceGroup" -Location "EastUS"
 
 CLI:
+az group create --name "MyResourceGroup" --location "EastUS"
 
 
 TF:
