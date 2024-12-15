@@ -1,0 +1,64 @@
+# Create a Storage Account
+# Storage accounts provide a unique namespace for your data in Azure Storage
+New-AzStorageAccount -ResourceGroupName MyResourceGroup -Location "East US" -Name mystorageaccount123 -SkuName Standard_LRS
+
+# Create a Load Balancer
+# Load balancers distribute incoming network traffic across multiple servers
+New-AzLoadBalancer -ResourceGroupName MyResourceGroup -Location "East US" -Name MyLoadBalancer -FrontendIpConfiguration $frontendIpConfig
+
+# Create a Virtual Machine Scale Set (VMSS)
+# VMSS allows you to deploy and manage a set of auto-scaling VMs
+New-AzVmss -ResourceGroupName MyResourceGroup -Location "East US" -Name MyVMSS -ImageName "UbuntuLTS" -InstanceCount 2 -UpgradePolicyMode Manual
+
+# Create a SQL Server
+# SQL Server is the host for Azure SQL databases
+New-AzSqlServer -ResourceGroupName MyResourceGroup -Location "East US" -ServerName myazuresqlserver -SqlAdministratorCredentials (Get-Credential)
+
+# Create an Azure SQL Database
+# A SQL Database is a fully managed relational database
+New-AzSqlDatabase -ResourceGroupName MyResourceGroup -ServerName myazuresqlserver -DatabaseName MyDatabase -Edition "Basic"
+
+# Create an Azure Web App (App Service)
+# App Service is a platform for building and hosting web apps
+New-AzWebApp -ResourceGroupName MyResourceGroup -Location "East US" -Name MyWebApp -AppServicePlan MyAppServicePlan
+
+# Create a Key Vault
+# Azure Key Vault helps safeguard cryptographic keys and secrets
+New-AzKeyVault -ResourceGroupName MyResourceGroup -Location "East US" -VaultName MyKeyVault
+
+# Create a Container Instance
+# Azure Container Instances enable you to run containers without managing virtual machines
+New-AzContainerGroup -ResourceGroupName MyResourceGroup -Location "East US" -Name MyContainerGroup -Image "mcr.microsoft.com/azuredocs/aci-helloworld"
+
+# Create a Function App
+# Azure Functions is a serverless compute service that allows you to run event-driven functions
+New-AzFunctionApp -ResourceGroupName MyResourceGroup -Location "East US" -Name MyFunctionApp -StorageAccountName MyStorageAccount -Plan MyFunctionAppServicePlan
+
+# Create a VPN Gateway
+# A VPN gateway connects an Azure VNet to an on-premises network
+New-AzVirtualNetworkGateway -ResourceGroupName MyResourceGroup -Location "East US" -Name MyVPNGateway -GatewayType Vpn -VpnType RouteBased
+
+# Create an Application Gateway
+# An application gateway is a web traffic load balancer
+New-AzApplicationGateway -ResourceGroupName MyResourceGroup -Location "East US" -Name MyAppGateway -FrontendIpConfiguration $frontendIpConfig
+
+# Create a Traffic Manager Profile
+# Traffic Manager allows you to control the distribution of traffic to multiple service endpoints
+New-AzTrafficManagerProfile -ResourceGroupName MyResourceGroup -Name MyTrafficManagerProfile -TrafficRoutingMethod Performance -DnsConfigName MyDnsConfig
+
+# Create a Redis Cache
+# Azure Redis Cache provides a fully managed Redis service for caching
+New-AzRedisCache -ResourceGroupName MyResourceGroup -Location "East US" -Name MyRedisCache -Sku Basic -Capacity 1
+
+# Create a Cognitive Services Account
+# Azure Cognitive Services provides APIs for AI tasks like speech, language, and vision
+New-AzCognitiveServicesAccount -ResourceGroupName MyResourceGroup -Location "East US" -Name MyCognitiveService -Sku S1 -Kind TextAnalytics
+
+# Create a Firewall
+# Azure Firewall is a managed network security service that protects Azure VNets
+New-AzFirewall -ResourceGroupName MyResourceGroup -Location "East US" -Name MyFirewall
+
+# Create Event Hub Namespace and Event Hub
+# Event Hubs is a fully managed, real-time data ingestion service
+New-AzEventHubNamespace -ResourceGroupName MyResourceGroup -Location "East US" -Name MyEventHubNamespace
+New-AzEventHub -ResourceGroupName MyResourceGroup -NamespaceName MyEventHubNamespace -Name MyEventHub
