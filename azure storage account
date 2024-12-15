@@ -62,3 +62,116 @@ New-AzFirewall -ResourceGroupName MyResourceGroup -Location "East US" -Name MyFi
 # Event Hubs is a fully managed, real-time data ingestion service
 New-AzEventHubNamespace -ResourceGroupName MyResourceGroup -Location "East US" -Name MyEventHubNamespace
 New-AzEventHub -ResourceGroupName MyResourceGroup -NamespaceName MyEventHubNamespace -Name MyEventHub
+
+
+
+
+
+
+
+
+
+CLI:
+# Log in to Azure
+# This command logs you into your Azure account from the command line
+az login
+
+# Create a Resource Group
+# A resource group is a container that holds related Azure resources
+az group create --name MyResourceGroup --location eastus
+
+# Create a Virtual Network (VNet)
+# A VNet allows you to securely connect your Azure resources
+az network vnet create --resource-group MyResourceGroup --location eastus --name MyVNet --address-prefix 10.0.0.0/16 --subnet-name MySubnet --subnet-prefix 10.0.1.0/24
+
+# Create an Additional Subnet within the Virtual Network
+# Subnets are divisions within a VNet, allowing better network segmentation
+az network vnet subnet create --resource-group MyResourceGroup --vnet-name MyVNet --name MyAdditionalSubnet --address-prefix 10.0.2.0/24
+
+# Create a Network Security Group (NSG)
+# NSGs are used to filter network traffic to and from network interfaces, VMs, or subnets
+az network nsg create --resource-group MyResourceGroup --location eastus --name MyNSG
+
+# Create a Public IP Address
+# Public IP addresses are used for accessing Azure resources from the internet
+az network public-ip create --resource-group MyResourceGroup --location eastus --name MyPublicIP --allocation-method Dynamic
+
+# Create a Network Interface (NIC)
+# A NIC allows VMs to communicate with the network
+az network nic create --resource-group MyResourceGroup --location eastus --name MyNIC --vnet-name MyVNet --subnet MySubnet --public-ip-address MyPublicIP
+
+# Create a Virtual Machine (VM)
+# VMs are computing resources that can run applications and services
+az vm create --resource-group MyResourceGroup --location eastus --name MyVM --image UbuntuLTS --vnet-name MyVNet --subnet MySubnet --public-ip-address MyPublicIP --admin-username azureuser --generate-ssh-keys
+
+# Create a Storage Account
+# Storage accounts provide a unique namespace for your data in Azure Storage
+az storage account create --resource-group MyResourceGroup --location eastus --name mystorageaccount123 --sku Standard_LRS
+
+# Create a Load Balancer
+# Load balancers distribute network traffic across multiple servers to ensure high availability
+az network lb create --resource-group MyResourceGroup --location eastus --name MyLoadBalancer --frontend-ip-name MyFrontendIP --backend-pool-name MyBackendPool
+
+# Create a Virtual Machine Scale Set (VMSS)
+# VMSS enables you to deploy and manage a set of auto-scaling VMs
+az vmss create --resource-group MyResourceGroup --location eastus --name MyVMSS --image UbuntuLTS --instance-count 2 --upgrade-policy-mode Manual
+
+# Create a SQL Server
+# SQL Server is the host for Azure SQL databases
+az sql server create --resource-group MyResourceGroup --location eastus --name myazuresqlserver --admin-user sqladmin --admin-password <password>
+
+# Create an Azure SQL Database
+# A fully managed relational database provided by Azure SQL Database
+az sql db create --resource-group MyResourceGroup --server myazuresqlserver --name MyDatabase --edition Basic
+
+# Create a Web App (App Service)
+# Azure App Service is a fully managed platform for building and hosting web apps
+az webapp create --resource-group MyResourceGroup --location eastus --name MyWebApp --plan MyAppServicePlan
+
+# Create an Azure Key Vault
+# Azure Key Vault helps safeguard cryptographic keys and secrets used by cloud applications and services
+az keyvault create --resource-group MyResourceGroup --location eastus --name MyKeyVault
+
+# Create a Container Instance
+# Azure Container Instances allow you to run containers in Azure without managing VMs
+az container create --resource-group MyResourceGroup --location eastus --name MyContainerGroup --image mcr.microsoft.com/azuredocs/aci-helloworld
+
+# Create a Function App
+# Azure Functions is a serverless compute service that lets you run event-driven functions
+az functionapp create --resource-group MyResourceGroup --location eastus --name MyFunctionApp --storage-account mystorageaccount123 --plan MyFunctionAppServicePlan
+
+# Create a VPN Gateway
+# A VPN gateway connects an Azure Virtual Network to an on-premises network
+az network vnet-gateway create --resource-group MyResourceGroup --location eastus --name MyVPNGateway --gateway-type Vpn --vpn-type RouteBased
+
+# Create an Application Gateway
+# Application Gateway is a web traffic load balancer that enables you to manage traffic to your web apps
+az network application-gateway create --resource-group MyResourceGroup --location eastus --name MyAppGateway --frontend-port 80 --backend-port 80 --sku Standard_V2
+
+# Create a Traffic Manager Profile
+# Traffic Manager provides DNS-based traffic routing across multiple endpoints
+az network traffic-manager profile create --resource-group MyResourceGroup --name MyTrafficManagerProfile --routing-method Performance --dns-name mytrafficmanager --monitor-path /health
+
+# Create a Redis Cache
+# Redis Cache is a fully managed in-memory data store for caching
+az redis create --resource-group MyResourceGroup --location eastus --name MyRedisCache --sku Basic --capacity 1
+
+# Create a Cognitive Services Account
+# Cognitive Services enables developers to add AI capabilities to their apps
+az cognitiveservices account create --resource-group MyResourceGroup --location eastus --name MyCognitiveService --sku S1 --kind TextAnalytics
+
+# Create an Azure Firewall
+# Azure Firewall is a managed, cloud-based network security service that protects Azure Virtual Networks
+az network firewall create --resource-group MyResourceGroup --location eastus --name MyFirewall
+
+# Create an Event Hub Namespace
+# Event Hubs is a fully managed, real-time data ingestion service
+az eventhubs namespace create --resource-group MyResourceGroup --location eastus --name MyEventHubNamespace
+
+# Create an Event Hub within the Event Hub Namespace
+# Event Hubs is used for ingesting real-time events and telemetry
+az eventhubs eventhub create --resource-group MyResourceGroup --namespace-name MyEventHubNamespace --name MyEventHub
+
+
+
+
