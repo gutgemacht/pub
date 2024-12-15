@@ -1,0 +1,42 @@
+PS:
+
+# Create a resource group
+New-AzResourceGroup -Name MyResourceGroup -Location "East US"
+
+# Create a Virtual Network (VNet)
+New-AzVirtualNetwork -ResourceGroupName MyResourceGroup -Location "East US" -Name MyVNet -AddressPrefix "10.0.0.0/16"
+
+# Create a subnet inside the virtual network
+New-AzVirtualNetworkSubnetConfig -Name MySubnet -AddressPrefix "10.0.1.0/24" | 
+    Set-AzVirtualNetwork -VirtualNetwork $vnet
+
+# Create a Network Security Group
+New-AzNetworkSecurityGroup -ResourceGroupName MyResourceGroup -Location "East US" -Name MyNSG
+
+# Create a Public IP Address
+New-AzPublicIpAddress -ResourceGroupName MyResourceGroup -Location "East US" -Name MyPublicIP -AllocationMethod Dynamic
+
+# Create a NIC (Network Interface)
+New-AzNetworkInterface -ResourceGroupName MyResourceGroup -Location "East US" -Name MyNIC -SubnetId $subnet.Id -PublicIpAddressId $publicIP.Id
+
+
+
+
+CLI:
+# Create a resource group
+az group create --name MyResourceGroup --location eastus
+
+# Create a Virtual Network (VNet)
+az network vnet create --resource-group MyResourceGroup --name MyVNet --address-prefix 10.0.0.0/16 --subnet-name MySubnet --subnet-prefix 10.0.1.0/24
+
+# Add a new subnet to the existing VNet
+az network vnet subnet create --resource-group MyResourceGroup --vnet-name MyVNet --name MyAdditionalSubnet --address-prefix 10.0.2.0/24
+
+# Create a Network Security Group
+az network nsg create --resource-group MyResourceGroup --name MyNSG
+
+# Create a Public IP Address
+az network public-ip create --resource-group MyResourceGroup --name MyPublicIP --allocation-method Dynamic
+
+# Create a Network Interface (NIC) and associate it with a subnet and public IP
+az network nic create --resource-group MyResourceGroup --name MyNIC --vnet-name MyVNet --subnet MySubnet --public-ip-address MyPublicIP
