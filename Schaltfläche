@@ -1,6 +1,24 @@
-Betreff: Anfrage zur API-Dokumentation für das Ticketing-System
-Sehr geehrte Damen und Herren,
-ich nutze Ihr Ticketing-System und habe festgestellt, dass die manuelle Eingabe von Daten für jeden einzelnen Ticketvorgang sehr zeitaufwendig ist. Da die meisten der benötigten Informationen in den Tickets gleich bleiben, würde ich gerne die Erstellung der Tickets automatisieren.
-Daher möchte ich anfragen, ob es eine API gibt, die diesen Prozess unterstützt, und ob Sie mir die entsprechende Dokumentation zur Verfügung stellen können. Leider ist es mir nicht gelungen, die passende API-Dokumentation in Ihrem Katalog zu identifizieren, da die Bezeichnungen der APIs nicht eindeutig auf die Funktion zur Ticket-Erstellung hinweisen.
-Falls die API-Dokumentation nicht öffentlich zugänglich ist, bitte ich Sie, mir die notwendigen Informationen oder Hinweise zukommen zu lassen, um die API für die Ticket-Erstellung nutzen zu können.
-Vielen Dank im Voraus für Ihre Unterstützung!
+az backup policy create \
+  --resource-group MyResourceGroup \
+  --vault-name MyRecoveryVault \
+  --name MyBackupPolicy \
+  --policy '{"backupManagementType": "AzureIaaSVM", "schedulePolicy": {"scheduleRunFrequency": "Daily", "scheduleRunTimes": ["2024-12-17T02:00:00Z"]}, "retentionPolicy": {"dailySchedule": {"retentionDuration": {"count": 30, "durationType": "Days"}}}}'
+
+az backup protection backup-now \
+  --resource-group MyResourceGroup \
+  --vault-name MyRecoveryVault \
+  --container-name MyVM \
+  --item-name MyVM \
+  --retain-until "2024-12-31T00:00:00Z"
+
+
+View
+
+az backup item list --resource-group MyResourceGroup --vault-name MyRecoveryVault 
+
+Restore vm
+az backup recoverypoint list \
+  --resource-group MyResourceGroup \
+  --vault-name MyRecoveryVault \
+  --container-name MyVM \
+  --item-name MyVM 
