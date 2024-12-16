@@ -1,19 +1,37 @@
-#!/bin/bash
 
-# Step 1: Declare an array
-my_array=(one two three four)
+# Set parameters
+$resourceGroupName = "MyResourceGroup"
+$location = "EastUS"
+$vmName = "MyVM"
+$vmSize = "Standard_DS1_v2"
+$adminUsername = "azureuser"
+$adminPassword = "YourSecurePassword123!"
 
-# Step 2: Function to accept the array name as a parameter
-iterate_array() {
-    local array_name=$1 # Get the array name passed as an argument
-    local array_length=$(eval echo \${#${array_name}[@]}) # Get the array length
+# Create resource group (if not already existing)
+New-AzResourceGroup -Name $resourceGroupName -Location $location
 
-    # Step 3: Use indirect expansion to iterate through the array
-    for ((i=0; i<array_length; i++)); do
-        element=$(eval echo \${${array_name}[$i]}) # Access each element of the array
-        echo "Element $i: $element"
-    done
-}
+# Create a virtual network
+$virtualNetwork = New-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Location $location `
+  -Name "MyVnet" -AddressPrefix "10.0.0.0/16"
+$subnet = Add-AzVirtualNetworkSubnetConfig -Name "MySubnet" -AddressPrefix "10.0.0.0/24" `
+  -VirtualNetwork $virtualNetwork
+$virtualNetwork | Set-AzVirtualNetwork
 
-# Call the function and pass the name of the array
-iterate_array my_array
+# Create a public IP address
+$publicIp = New-AzPublicIpAddress -ResourceGroupName $resourceGroupName -Location $location `
+  -Name "MyPublicIP" -AllocationMethod Static
+
+# Create a network security group
+$nsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location `
+  -Name "MyNSG"
+
+# Create a network interface
+$networkInterface = New-AzNetworkInterface -ResourceGroupName $resourceGroupName -Location $location `
+  -Name "MyNIC" -SubnetId $virtualNetwork.Subnets[0].Id -PublicIpAddressId $publicIp.Id `
+  -NetworkSecurityGroupId $nsg.Id
+
+# Configure the VM
+$vmConfig = New-AzVMConfig -VMName $vmName -VMSize $vmSize `
+  | Set-AzVMOperatingSystem -Windows -ComputerName $vmName -Credential (Get-Credential -UserName $adminUsername) `
+  | Set-AzVMSourceImage -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer" -Skus "2019-Datacenter" -Version "latest" `
+  | Add-AzVMNetworkInterface -Id $networkInterface.Id
