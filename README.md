@@ -17,3 +17,5 @@ echo "Диалоговые процессы (DIA): $(ps -u $USER | grep -i 'DIA'
 echo "Фоновые процессы (BTC): $(ps -u $USER | grep -i 'BTC' | wc -l)"
 echo "Обновляющие процессы (UPD): $(ps -u $USER | grep -i 'UPD' | wc -l)"
 
+
+
