@@ -1,1 +1,18 @@
-jvm_args = -Xms4g -Xmx8g -XX:+UseG1GC -XX:MaxTenuringThreshold=10 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xlog:gc*:file=/usr/sap/<SID>/work/gc.log:time,uptime,level,tags
+#!/bin/bash
+
+# Function to sort file by column and print specific columns
+sort_by_column_and_print_columns() {
+  local filename="$1"
+  local column_number="$2"
+  local delimiter="${3:-" "}"  # Default delimiter is space
+  local columns_to_print="${4:-*}"  # Default to print all columns
+
+  sort -t "$delimiter" -k "$column_number" "$filename" | cut -d "$delimiter" -f "$columns_to_print"
+}
+
+# Example usage
+filename="data.txt"
+column_to_sort=1
+columns_to_print="1,3,5"  # Print columns 1, 3, and 5
+
+sort_by_column_and_print_columns "$filename" "$column_to_sort" "$delimiter" "$columns_to_print"
