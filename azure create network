@@ -1,42 +1,48 @@
-PS:
+#!/bin/bash
 
-# Create a resource group
-New-AzResourceGroup -Name MyResourceGroup -Location "East US"
+# Function to check for duplicate non-commented lines from a file
+check_duplicate_lines() {
+    local file="$1"
+    local line
+    local seen_lines
 
-# Create a Virtual Network (VNet)
-New-AzVirtualNetwork -ResourceGroupName MyResourceGroup -Location "East US" -Name MyVNet -AddressPrefix "10.0.0.0/16"
+    if [[ ! -f "$file" ]]; then
+        echo "Error: File '$file' does not exist." >&2
+        return 1
+    fi
 
-# Create a subnet inside the virtual network
-New-AzVirtualNetworkSubnetConfig -Name MySubnet -AddressPrefix "10.0.1.0/24" | 
-    Set-AzVirtualNetwork -VirtualNetwork $vnet
+    declare -A seen_lines # Declare associative array
 
-# Create a Network Security Group
-New-AzNetworkSecurityGroup -ResourceGroupName MyResourceGroup -Location "East US" -Name MyNSG
+    while IFS= read -r line; do
+        # Remove leading whitespace
+        line=$(echo "$line" | sed 's/^[[:space:]]*//')
 
-# Create a Public IP Address
-New-AzPublicIpAddress -ResourceGroupName MyResourceGroup -Location "East US" -Name MyPublicIP -AllocationMethod Dynamic
+        # Skip empty and comment lines
+        if [[ -z "$line" ]] || [[ "${line:0:1}" == "#" ]]; then
+            continue
+        fi
 
-# Create a NIC (Network Interface)
-New-AzNetworkInterface -ResourceGroupName MyResourceGroup -Location "East US" -Name MyNIC -SubnetId $subnet.Id -PublicIpAddressId $publicIP.Id
+        # Check for duplicates
+        if [[ -v "seen_lines[$line]" ]]; then
+            echo "Error: Duplicate line found: '$line' in '$file'." >&2
+            return 1  # Indicate error by returning non-zero
+        else
+           seen_lines["$line"]=1;
+        fi
+    done < "$file"
 
+    # No duplicates found
+    return 0 # Indicate success by returning zero
+}
 
+# Example usage
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <file>" >&2
+    exit 1
+fi
 
+file_to_process="$1"
 
-CLI:
-# Create a resource group
-az group create --name MyResourceGroup --location eastus
-
-# Create a Virtual Network (VNet)
-az network vnet create --resource-group MyResourceGroup --name MyVNet --address-prefix 10.0.0.0/16 --subnet-name MySubnet --subnet-prefix 10.0.1.0/24
-
-# Add a new subnet to the existing VNet
-az network vnet subnet create --resource-group MyResourceGroup --vnet-name MyVNet --name MyAdditionalSubnet --address-prefix 10.0.2.0/24
-
-# Create a Network Security Group
-az network nsg create --resource-group MyResourceGroup --name MyNSG
-
-# Create a Public IP Address
-az network public-ip create --resource-group MyResourceGroup --name MyPublicIP --allocation-method Dynamic
-
-# Create a Network Interface (NIC) and associate it with a subnet and public IP
-az network nic create --resource-group MyResourceGroup --name MyNIC --vnet-name MyVNet --subnet MySubnet --public-ip-address MyPublicIP
+if ! check_duplicate_lines "$file_to_process"; then
+    exit 1
+fi
