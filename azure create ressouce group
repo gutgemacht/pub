@@ -1,26 +1,95 @@
-Ressource Group creation
+#!/bin/bash
+################################################################################
+#                             Recommendations Script                           #
+# This script provides additional recommendations for configuring system VMs  #
+# in Qubes OS. These can be implemented to improve security, logging, and      #
+# error handling in your current setup.                                        #
+################################################################################
 
-PS:
-New-AzResourceGroup -Name "MyResourceGroup" -Location "EastUS"
+# GENERAL IMPROVEMENTS ########################################################
 
-CLI:
-az group create --name "MyResourceGroup" --location "EastUS"
+# 1. Exit script on errors to ensure proper setup.
+set -e
 
+# 2. Use logging for troubleshooting during configuration changes.
+LOG_FILE="/var/log/vm-setup.log"
+exec > >(tee -i $LOG_FILE)
+exec 2>&1
 
-TF:
-provider "azurerm" {
-  features {}
-}
+# SYS-PRE-FIREWALL ############################################################
 
-variable "resource_group_name" {
-  default = "MyResourceGroup"
-}
+# 3. Validate nftables configuration before applying.
+if sudo nft -c -f /etc/nftables.conf; then
+  echo "nftables configuration syntax is valid."
+else
+  echo "nftables configuration syntax contains errors!" >&2
+  exit 1
+fi
 
-variable "location" {
-  default = "EastUS"
-}
+# 4. Add logging to nftables rules for troubleshooting.
+echo "Adding logging to nftables rules..."
+sudo sed -i '/chain input {/a \
+    log prefix "nftables input: " flags all;' /etc/nftables.conf
 
-resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
-  location = var.location
-}
+# SYS-VPN #####################################################################
+
+# 5. Ensure VPN connectivity before applying firewall rules.
+VPN_INTERFACE="tun0"
+if curl --interface "$VPN_INTERFACE" -s https://ifconfig.me; then
+  echo "VPN is up and running on $VPN_INTERFACE."
+else
+  echo "VPN is not active. Check your configuration." >&2
+  exit 1
+fi
+
+# 6. Set up a kill-switch to block non-VPN traffic.
+echo "Setting up VPN kill-switch..."
+sudo iptables -A OUTPUT ! -o "$VPN_INTERFACE" -j DROP
+sudo iptables -A FORWARD ! -o "$VPN_INTERFACE" -j DROP
+
+# SYS-POST-FIREWALL ###########################################################
+
+# 7. Add intrusion detection with snort or suricata.
+echo "Installing snort for IDS..."
+sudo apt install -y snort
+sudo systemctl enable snort
+sudo systemctl start snort
+
+# Example snort rule file (customize as needed).
+echo "Creating a basic snort rule..."
+echo 'alert icmp any any -> any any (msg:"ICMP Packet Detected"; sid:1000001;)' | \
+    sudo tee /etc/snort/rules/local.rules > /dev/null
+
+# SYS-TOR #####################################################################
+
+# 8. Configure Tor logging and hidden services for enhanced privacy.
+TORRC_FILE="/etc/tor/torrc"
+echo "Configuring Tor..."
+sudo sed -i '/Log notice/a \
+    Log notice file /var/log/tor/notices.log' "$TORRC_FILE"
+
+# Example hidden service setup.
+echo "Setting up a hidden service (example)..."
+echo -e "HiddenServiceDir /var/lib/tor/hidden_service/\nHiddenServicePort 80 127.0.0.1:80" | \
+    sudo tee -a "$TORRC_FILE" > /dev/null
+
+# FINAL TESTING ###############################################################
+
+# 9. Verify system services are active.
+echo "Verifying essential services..."
+SERVICES=("nftables" "openvpn" "tor")
+for service in "${SERVICES[@]}"; do
+  if systemctl is-active --quiet "$service"; then
+    echo "$service is running."
+  else
+    echo "$service is not running. Check its configuration." >&2
+  fi
+done
+
+# 10. Test firewall rules to ensure proper functionality.
+echo "Testing firewall rules..."
+sudo nft list ruleset
+sudo iptables -L -v -n
+
+echo "Recommendations script completed successfully."
+################################################################################
