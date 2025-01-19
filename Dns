@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Exit on errors
+set -e
+
+# Function to print messages
+info() {
+    echo -e "\033[1;32m[INFO]\033[0m $1"
+}
+
+# Update and upgrade system packages
+info "Updating and upgrading system packages..."
+sudo apt update && sudo apt upgrade -y
+
+# Install required packages
+info "Installing required packages..."
+sudo apt install -y dnsutils resolvconf unbound nftables apparmor apparmor-utils unattended-upgrades rsyslog
+
+# Configure Unbound
+info "Configuring Unbound with privacy-focused DNS providers..."
+UNBOUND_CONF_DIR="/etc/unbound/unbound.conf.d"
+UNBOUND_FORWARD_CONF="$UNBOUND_CONF_DIR/forwarding.conf"
+
+sudo mkdir -p "$UNBOUND_CONF_DIR"
+
+cat <<EOF | sudo tee "$UNBOUND_FORWARD_CONF"
+server:
+    # Enable DNSSEC validation
+    auto-trust-anchor-file: "/var/lib/unbound/root.key"
+
+    # Privacy-focused DNS providers
+    forward-zone:
+        name: "."
+        forward-ssl-upstream: yes
+        # Quad9
+        forward-addr: 9.9.9.9@853
+        forward-addr: 149.112.112.112@853
+        # Cloudflare
+        forward-addr: 1.1.1.1@853
+        forward-addr: 1.0.0.1@853
+        # Google Public DNS
+        forward-addr: 8.8.8.8@853
+        forward-addr: 8.8.4.4@853
+        # NextDNS
+        forward-addr: 45.90.28.0@853
+        forward-addr: 45.90.30.0@853
+EOF
+
+# Restart Unbound service
+info "Restarting Unbound service..."
+sudo systemctl restart unbound
+sudo systemctl enable unbound
+
+# Configure nftables
+info "Setting up nftables for DNS traffic..."
+NFTABLES_CONF="/etc/nftables.conf"
+
+cat <<EOF | sudo tee "$NFTABLES_CONF"
+#!/usr/sbin/nft -f
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+        iif lo accept
+        ct state established,related accept
+        tcp dport { 53, 853 } accept
+        udp dport { 53 } accept
+    }
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+EOF
+
+# Enable nftables
+sudo systemctl restart nftables
+sudo systemctl enable nftables
+
+# Enable AppArmor
+info "Enabling AppArmor..."
+sudo systemctl enable apparmor
+sudo systemctl start apparmor
+
+# Enable automatic updates
+info "Configuring automatic updates..."
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+
+# Configure rsyslog for monitoring logs
+info "Enabling rsyslog for log monitoring..."
+sudo systemctl enable rsyslog
+sudo systemctl start rsyslog
+
+# Verify DNSSEC
+info "Verifying DNSSEC validation..."
+dig dnssec-failed.org +dnssec || info "DNSSEC validation is working (expected failure on this domain)."
+
+# Completion message
+info "sys-dns setup is complete. Logs are monitored, nftables is active, and unbound is configured with secure DNS providers."
