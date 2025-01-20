@@ -1,1 +1,37 @@
 
+nft flush ruleset
+nft add table inet filter
+nft add chain inet filter input { type filter hook input priority 0; policy drop; }
+nft add chain inet filter output { type filter hook output priority 0; policy drop; }
+nft add chain inet filter forward { type filter hook forward priority 0; policy drop; }
+
+nft add rule inet filter input ct state invalid drop
+nft add rule inet filter output ct state invalid drop
+
+nft add rule inet filter input ct state established,related accept
+nft add rule inet filter input ct state new drop
+
+nft add rule inet filter input ct state new limit rate 50/second accept
+nft add rule inet filter input ct state new limit rate 25/second accept
+
+nft add rule inet filter input log prefix "Dropped packet: " counter
+
+nft add table arp filter
+nft add chain arp filter input { type filter hook input priority 0; policy drop; }
+nft add chain arp filter output { type filter hook output priority 0; policy drop; }
+
+nft add rule arp filter input arp operation request drop
+nft add rule arp filter input arp operation reply drop
+nft add rule arp filter output arp operation request drop
+nft add rule arp filter output arp operation reply drop
+
+nft add rule inet filter input icmp type echo-request drop
+nft add rule inet filter input icmp type echo-reply drop
+nft add rule inet filter output icmp type echo-request drop
+nft add rule inet filter output icmp type echo-reply drop
+
+nft add rule inet filter input tcp dport 53 accept
+nft add rule inet filter input udp dport 53 accept
+nft add rule inet filter input tcp dport 443 accept
+
+nft add rule inet filter input drop
