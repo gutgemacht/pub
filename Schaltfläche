@@ -1,44 +1,35 @@
-# Создание таблицы inet filter
+#!/bin/bash
+
+# Flush existing rules and reset
+nft flush ruleset
+
+# Create the filter table and chains
 nft add table inet filter
+nft add chain inet filter input { type filter hook input priority 0; policy drop; }
+nft add chain inet filter output { type filter hook output priority 0; policy drop; }
 
-# Создание цепочек в таблице filter
-nft add chain inet filter input { type filter hook input priority filter; policy accept; }
-nft add chain inet filter forward { type filter hook forward priority filter; policy accept; }
-nft add chain inet filter output { type filter hook output priority filter; policy accept; }
+# Allow incoming DNS-over-TLS (DoT) requests on port 853
+nft add rule inet filter input ip protocol tcp dport 853 ct state new,related,established accept
 
-# Создание таблицы ip qubes
-nft add table ip qubes
+# Allow outgoing DNS-over-TLS responses from port 853
+nft add rule inet filter output ip protocol tcp sport 853 ct state established,related accept
 
-# Создание набора downstream
-nft add set ip qubes downstream { type ipv4_addr; }
+# Allow outgoing DNS-over-TLS queries to upstream resolvers on port 853
+nft add rule inet filter output ip protocol tcp dport 853 ct state new,related,established accept
 
-# Создание набора allowed
-nft add set ip qubes allowed { type ifname . ipv4_addr; }
-
-# Создание цепочки prerouting
-nft add chain ip qubes prerouting { type filter hook prerouting priority raw; policy accept; }
-nft add rule ip qubes prerouting iifgroup 2 goto antispoof
-nft add rule ip qubes prerouting ip saddr @downstream counter packets 0 bytes drop
-
-# Создание цепочки antispoof
-nft add chain ip qubes antispoof { }
-nft add rule ip qubes antispoof iifname . ip saddr @allowed accept
-nft add rule ip qubes antispoof counter packets 0 bytes drop
-
-# Создание цепочки postrouting
-nft add chain ip qubes postrouting { type nat hook postrouting priority srcnat; policy accept; }
-nft add rule ip qubes postrouting oifgroup 2 accept
-nft add rule ip qubes postrouting oif "lo" accept
-nft add rule ip qubes postrouting masquerade
-
-# Настройка цепочки input
-nft add chain inet filter input { type filter hook input priority filter; policy drop; }
-nft add rule inet filter input ct state invalid counter packets 0 bytes drop
-nft add rule inet filter input iifgroup 2 udp dport 68 counter packets 0 bytes drop
+# Allow general connection tracking for established/related connections
 nft add rule inet filter input ct state established,related accept
-nft add rule inet filter input iif "lo" accept
-nft add rule inet filter input iifgroup 2 counter packets 0 bytes reject with icmp host-prohibited
+nft add rule inet filter output ct state established,related accept
 
-# Настройка цепочки forward
-nft add chain inet filter forward { type filter hook forward priority filter; policy accept; }
-nft add rule inet filter forward ct state invalid counter packets 0 bytes drop
+# Drop everything else
+nft add rule inet filter input drop
+nft add rule inet filter output drop
+
+# Save rules to /etc/nftables.conf
+nft list ruleset > /etc/nftables.conf
+
+# Enable and restart nftables service
+systemctl enable nftables
+systemctl restart nftables
+
+echo "nftables configuration for DNS-over-TLS on port 853 applied successfully."
