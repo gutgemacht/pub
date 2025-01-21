@@ -1,37 +1,30 @@
+Sys*fw
 
+# Flush any existing rules
 nft flush ruleset
+
+# Create the table and chains
 nft add table inet filter
-nft add chain inet filter input { type filter hook input priority 0; policy drop; }
-nft add chain inet filter output { type filter hook output priority 0; policy drop; }
-nft add chain inet filter forward { type filter hook forward priority 0; policy drop; }
+nft add chain inet filter input { type filter hook input priority 0 \; policy drop \; }
+nft add chain inet filter forward { type filter hook forward priority 0 \; policy drop \; }
+nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
 
-nft add rule inet filter input ct state invalid drop
-nft add rule inet filter output ct state invalid drop
+# Allow local traffic
+nft add rule inet filter input iif lo accept
+nft add rule inet filter output oif lo accept
 
-nft add rule inet filter input ct state established,related accept
-nft add rule inet filter input ct state new drop
+# Allow established/related traffic
+nft add rule inet filter forward state established,related accept
 
-nft add rule inet filter input ct state new limit rate 50/second accept
-nft add rule inet filter input ct state new limit rate 25/second accept
+# Allow specific AppVM outbound traffic (e.g., 443 for HTTPS)
+nft add rule inet filter forward iif "vif*" oif eth0 tcp dport { 80, 443 } accept
 
-nft add rule inet filter input log prefix "Dropped packet: " counter
+# Allow ICMP
+nft add rule inet filter input ip protocol icmp accept
+nft add rule inet filter output ip protocol icmp accept
 
-nft add table arp filter
-nft add chain arp filter input { type filter hook input priority 0; policy drop; }
-nft add chain arp filter output { type filter hook output priority 0; policy drop; }
+# Drop all other forward traffic
+nft add rule inet filter forward drop
 
-nft add rule arp filter input arp operation request drop
-nft add rule arp filter input arp operation reply drop
-nft add rule arp filter output arp operation request drop
-nft add rule arp filter output arp operation reply drop
-
-nft add rule inet filter input icmp type echo-request drop
-nft add rule inet filter input icmp type echo-reply drop
-nft add rule inet filter output icmp type echo-request drop
-nft add rule inet filter output icmp type echo-reply drop
-
-nft add rule inet filter input tcp dport 53 accept
-nft add rule inet filter input udp dport 53 accept
-nft add rule inet filter input tcp dport 443 accept
-
-nft add rule inet filter input drop
+# Save the configuration
+nft list ruleset > /etc/nftables.conf
