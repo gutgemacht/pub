@@ -1,0 +1,21 @@
+# Create the filter table if it doesn't exist
+sudo nft add table ip filter
+
+# Create the input chain if it doesn't exist
+sudo nft add chain ip filter input { type filter hook input priority 0 \; }
+
+# Create the output chain if it doesn't exist
+sudo nft add chain ip filter output { type filter hook output priority 0 \; }
+
+# Allow outgoing DNS queries (UDP to port 53)
+sudo nft add rule ip filter output udp dport 53 accept
+
+# Allow incoming DNS responses (UDP from port 53)
+sudo nft add rule ip filter input udp sport 53 accept
+
+# Optionally, allow DNS only to a specific DNS server (e.g., 10.139.1.1)
+sudo nft add rule ip filter output udp dport 53 ip daddr 10.139.1.1 accept
+sudo nft add rule ip filter input udp sport 53 ip saddr 10.139.1.1 accept
+
+# Optionally, block DNS queries to unauthorized DNS servers
+sudo nft add rule ip filter output udp dport 53 ip daddr != 10.139.1.1 drop
