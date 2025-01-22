@@ -1,35 +1,91 @@
 #!/bin/bash
 
-# Flush existing rules and reset
-nft flush ruleset
+# Define variables
+SYS_DNS="10.138.24.44"  # IP address of sys-dns
+APPVMS_SUBNETS=("10.138.14.0/24" "10.137.0.0/24" "10.138.29.0/24")  # Subnets of appvms
 
-# Create the filter table and chains
+# Create nftables table for inet (IPv4 + IPv6)
 nft add table inet filter
-nft add chain inet filter input { type filter hook input priority 0; policy drop; }
-nft add chain inet filter output { type filter hook output priority 0; policy drop; }
 
-# Allow incoming DNS-over-TLS (DoT) requests on port 853
-nft add rule inet filter input ip protocol tcp dport 853 ct state new,related,established accept
+# Create chains for input, output, and forward
+nft add chain inet filter input { type filter hook input priority 0 \; }
+nft add chain inet filter forward { type filter hook forward priority 0 \; }
+nft add chain inet filter output { type filter hook output priority 0 \; }
 
-# Allow outgoing DNS-over-TLS responses from port 853
-nft add rule inet filter output ip protocol tcp sport 853 ct state established,related accept
+# Enable IP forwarding for IPv4 (but not for IPv6)
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv6.ip_forward=0  # Disable IPv6 forwarding
 
-# Allow outgoing DNS-over-TLS queries to upstream resolvers on port 853
-nft add rule inet filter output ip protocol tcp dport 853 ct state new,related,established accept
+# Apply persistence for IP forwarding
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv6.ip_forward = 0" >> /etc/sysctl.conf
 
-# Allow general connection tracking for established/related connections
-nft add rule inet filter input ct state established,related accept
-nft add rule inet filter output ct state established,related accept
+# Apply the changes
+sysctl -p
 
-# Drop everything else
+# Block any incoming and outgoing IPv6 traffic
+nft add rule inet filter input ip6 drop  # Block all incoming IPv6
+nft add rule inet filter output ip6 drop # Block all outgoing IPv6
+
+# Block all IPv6 forwarding
+nft add rule inet filter forward ip6 drop
+
+# Add rule to allow input traffic on DNS port (53) for IPv4 only
+nft add rule inet filter input ip dport 53 accept
+nft add rule inet filter input ip6 dport 53 accept
+
+# Add rules to allow forwarding DNS traffic from appvms to sys-dns (only IPv4)
+for subnet in "${APPVMS_SUBNETS[@]}"
+do
+    nft add rule inet filter forward ip saddr $subnet ip dport 53 dnat to $SYS_DNS
+    nft add rule inet filter forward ip dport 53 ip daddr $SYS_DNS accept
+done
+
+# Allow DNS over TLS (port 853) from sys-dns to the Internet
+nft add rule inet filter input ip saddr $SYS_DNS ip dport 853 accept
+nft add rule inet filter forward ip saddr $SYS_DNS ip dport 853 accept
+
+# Allow HTTPS (port 443) from appvms subnets to the Internet
+for subnet in "${APPVMS_SUBNETS[@]}"
+do
+    nft add rule inet filter input ip saddr $subnet ip dport 443 accept
+    nft add rule inet filter forward ip saddr $subnet ip dport 443 accept
+done
+
+# Block all ARP (Address Resolution Protocol) traffic
+nft add rule inet filter input arp drop
+nft add rule inet filter output arp drop
+nft add rule inet filter forward arp drop
+
+# Block all ICMP traffic (for IPv4)
+nft add rule inet filter input ip protocol icmp drop
+nft add rule inet filter output ip protocol icmp drop
+nft add rule inet filter forward ip protocol icmp drop
+
+# Block all ICMPv6 traffic (for IPv6)
+nft add rule inet filter input ip6 protocol icmpv6 drop
+nft add rule inet filter output ip6 protocol icmpv6 drop
+nft add rule inet filter forward ip6 protocol icmpv6 drop
+
+# Block any incoming, outgoing, and forwarded traffic on any other ports (except for ports defined above)
+nft add rule inet filter input ip dport != {53, 443, 853} drop
+nft add rule inet filter output ip sport != {53, 443, 853} drop
+nft add rule inet filter forward ip dport != {53, 443, 853} drop
+nft add rule inet filter forward ip sport != {53, 443, 853} drop
+
+# Block all incoming traffic on other ports (other than DNS, HTTPS, DNS over TLS)
+nft add rule inet filter input ip dport != {53, 443, 853} drop
+
+# Block all incoming traffic on any other ports (except those defined above)
 nft add rule inet filter input drop
-nft add rule inet filter output drop
 
-# Save rules to /etc/nftables.conf
+# Disable IPv6 completely on the system by setting sysctl options (in addition to nftables)
+sysctl -w net.ipv6.conf.all.disable_ipv6=1  # Disable IPv6 globally
+sysctl -w net.ipv6.conf.default.disable_ipv6=1  # Disable IPv6 on all interfaces
+
+# Persist IPv6 disablement for future reboots
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+
+# Persist the nftables rules (optional, requires root)
 nft list ruleset > /etc/nftables.conf
-
-# Enable and restart nftables service
-systemctl enable nftables
-systemctl restart nftables
-
-echo "nftables configuration for DNS-over-TLS on port 853 applied successfully."
