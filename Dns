@@ -1,32 +1,38 @@
-Sub ShowCheckboxSettings()
+Sub SetDropdownValue()
 
   Dim cc As ContentControl
-  Dim checkboxDetails As String
-  checkboxDetails = ""
+  Dim i As Integer
+  Dim entryFound As Boolean
+  Dim targetValue As String
+  targetValue = "Option 1" ' Set this to the desired dropdown value (e.g., "Option 1")
 
   ' Loop through each content control in the document
   For Each cc In ActiveDocument.ContentControls
 
-    ' Check if the content control is a checkbox (type 4)
-    If cc.Type = 4 Then ' Type 4 corresponds to a checkbox
+    ' Check if the content control is a dropdown (type 3)
+    If cc.Type = wdContentControlDropdown Then
 
-      ' Collect the checkbox properties
-      checkboxDetails = checkboxDetails & "Checkbox Title: " & cc.Title & vbCrLf
-      checkboxDetails = checkboxDetails & "Checkbox Tag: " & cc.Tag & vbCrLf
-      checkboxDetails = checkboxDetails & "Checked: " & IIf(cc.Checked, "Yes", "No") & vbCrLf
-      checkboxDetails = checkboxDetails & "Locked: " & IIf(cc.Locked, "Yes", "No") & vbCrLf
-      checkboxDetails = checkboxDetails & "Value: " & cc.Value & vbCrLf
-      checkboxDetails = checkboxDetails & "----------------------------------------" & vbCrLf
+      entryFound = False ' Reset entry found flag for each dropdown
+
+      ' Loop through the dropdown entries to find the target value
+      For i = 1 To cc.DropdownEntries.Count
+        If cc.DropdownEntries(i).Text = targetValue Then
+          ' Set the value by selecting the appropriate entry
+          cc.DropdownListEntries(i).Select
+          entryFound = True
+          Exit For ' Exit loop once the value is found and set
+        End If
+      Next i
+
+      ' If the value was not found, notify the user
+      If Not entryFound Then
+        MsgBox "Value '" & targetValue & "' not found in dropdown for " & cc.Title, vbExclamation, "Dropdown Value Not Found"
+      End If
 
     End If
 
   Next cc
 
-  ' Display the collected checkbox details in a message box
-  If Len(checkboxDetails) > 0 Then
-    MsgBox checkboxDetails, vbInformation, "Checkbox Settings"
-  Else
-    MsgBox "No checkboxes found in the document.", vbInformation, "No Checkboxes"
-  End If
+  MsgBox "All dropdowns have been set to the value '" & targetValue & "'.", vbInformation, "Dropdowns Updated"
 
 End Sub
