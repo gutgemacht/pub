@@ -1,26 +1,17 @@
-Sub SetCheckBoxesToCross()
+Sub SetFormCheckBoxesToCross()
 
-  Dim cc As ContentControl
-  Dim checkBoxCount As Long ' Counter for checkboxes found
+  Dim ff As FormField
 
-  checkBoxCount = 0 ' Initialize the counter
+  For Each ff In ActiveDocument.FormFields
 
-  ' Loop through each content control in the active document
-  For Each cc In ActiveDocument.ContentControls
-
-    ' Check if the content control is a checkbox
-    If cc.Type = wdContentControlCheckBox Then
-
-      ' Set the checkbox value to display a cross (assuming "X" is the value for cross)
-      cc.Range.Text = "X"  ' Or the appropriate value for your cross symbol
-
-      checkBoxCount = checkBoxCount + 1 ' Increment the counter
+    If ff.Type = wdFieldFormCheckBox Then
+      ff.CheckBox.Value = False  ' Uncheck (you might need to set to True for "X" depending on how your "X" is displayed)
+      ff.Range.Text = "X" ' Set the text to "X" (or your cross symbol)
 
     End If
 
-  Next cc
+  Next ff
 
-  ' Display a message box showing the number of checkboxes found
-  MsgBox "Found and updated " & checkBoxCount & " checkbox content controls.", vbInformation, "Checkboxes Updated"
+  MsgBox "Found and updated " & ActiveDocument.FormFields.Count & " form field checkboxes.", vbInformation, "Checkboxes Updated"
 
 End Sub
