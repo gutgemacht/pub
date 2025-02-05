@@ -1,34 +1,18 @@
-Sub SetCheckBoxToCross45Degrees()
-    Dim ff As FormField
-    Dim newState As Long
-    Dim foundCheckbox As Boolean
-    
-    ' Set the state to the desired one (cross at 45 degrees)
-    newState = 2 ' Adjust this to the correct state value for cross at 45 degrees
-    foundCheckbox = False ' Initialize the flag to check if any checkboxes are found
-    
-    ' Loop through all form fields in the document
-    For Each ff In ActiveDocument.FormFields
-        ' Debugging: Show the name and type of each form field
-        MsgBox "Checking FormField: Name = " & ff.Name & ", Type = " & ff.Type
-        
-        ' Check if the field is a checkbox (Type 4)
-        If ff.Type = wdFieldFormCheckBox Then
-            ' Check if the name matches the checkbox you want
-            If ff.Name = "Check" Then
-                MsgBox "Found checkbox with Name: " & ff.Name
-                
-                ' Set the state to "cross at 45 degrees"
-                ff.CheckBox.Value = newState
-                MsgBox "Changed checkbox to desired state (cross at 45 degrees)."
-                
-                foundCheckbox = True
-            End If
-        End If
-    Next ff
-    
-    ' If no checkbox was found, show a message
-    If Not foundCheckbox Then
-        MsgBox "No checkboxes with Name 'Check' found."
+Sub SetCheckBoxesToCross()
+
+  Dim cc As ContentControl
+
+  ' Loop through each content control in the active document
+  For Each cc In ActiveDocument.ContentControls
+
+    ' Check if the content control is a checkbox
+    If cc.Type = wdContentControlCheckBox Then
+
+      ' Set the checkbox value to display a cross (assuming "X" is the value for cross)
+      cc.Range.Text = "X"  ' Or the appropriate value for your cross symbol
+
     End If
+
+  Next cc
+
 End Sub
