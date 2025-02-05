@@ -1,17 +1,31 @@
-Sub SetFormCheckBoxesToCross()
+Sub SetSymbolCheckBoxesToCross()
 
-  Dim ff As FormField
+  Dim strFind As String
+  Dim strReplace As String
 
-  For Each ff In ActiveDocument.FormFields
+  ' Set the character code for the checkbox you want to replace (find it in the Symbol dialog)
+  strFind = "^u" & "00A3"  ' Example: Wingdings checkbox (replace with your code)
 
-    If ff.Type = wdFieldFormCheckBox Then
-      ff.CheckBox.Value = False  ' Uncheck (you might need to set to True for "X" depending on how your "X" is displayed)
-      ff.Range.Text = "X" ' Set the text to "X" (or your cross symbol)
+  ' Set the character code for the cross symbol you want to use (in the same font)
+  strReplace = "^u" & "00A5"  ' Example: Wingdings cross (replace with your code)
 
-    End If
+  ' Use Find and Replace to replace all instances
+  With Selection.Find
+    .ClearFormatting
+    .Replacement.ClearFormatting
+    .Text = strFind
+    .Replacement.Text = strReplace
+    .Forward = True
+    .Wrap = wdWrapContinue
+    .Format = False
+    .MatchCase = False
+    .MatchWholeWord = False
+    .MatchWildcards = False
+    .MatchSoundsLike = False
+    .MatchAllWordForms = False
+    .Execute Replace:=wdReplaceAll
+  End With
 
-  Next ff
-
-  MsgBox "Found and updated " & ActiveDocument.FormFields.Count & " form field checkboxes.", vbInformation, "Checkboxes Updated"
+  MsgBox "Replaced all instances of the checkbox symbol.", vbInformation, "Checkboxes Updated"
 
 End Sub
