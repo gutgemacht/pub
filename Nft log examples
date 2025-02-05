@@ -1,19 +1,12 @@
 Sub ChangeCheckboxToEmpty()
     Dim cc As ContentControl
-    Dim ccText As String
     
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
         ' Check if the content control is a checkbox
         If cc.Type = wdContentControlCheckBox Then
-            ' Get the current text of the checkbox (tick, cross, or empty)
-            ccText = cc.Range.Text
-            
-            ' Change the text to empty state (☐) if it is checked or has a cross
-            If ccText = "✔" Or ccText = "✗" Then
-                ' Set checkbox to empty state (☐)
-                cc.Range.Text = "☐"
-            End If
+            ' If the checkbox is checked or unchecked, set it to unchecked (empty)
+            cc.Checked = False
         End If
     Next cc
 End Sub
