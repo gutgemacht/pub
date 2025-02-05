@@ -1,17 +1,18 @@
-Sub ChangeCheckboxState()
-    Dim cb As Object
-    Set cb = ActiveDocument.Shapes("CheckBox1").OLEFormat.Object ' Adjust if needed
-
-    ' Change the checkbox state and color based on current state
-    Select Case cb.Value
-        Case 0 ' Unchecked state
-            cb.Value = 1 ' Change to checked
-            cb.BackColor = RGB(255, 0, 0) ' Red (Cross color)
-        Case 1 ' Checked state
-            cb.Value = 2 ' Change to indeterminate
-            cb.BackColor = RGB(0, 255, 0) ' Green (Checkmark color)
-        Case 2 ' Indeterminate state
-            cb.Value = 0 ' Change to unchecked
-            cb.BackColor = RGB(255, 255, 0) ' Yellow (Hourglass color)
+Private Sub CheckBox1_Click()
+    Static currentState As Integer
+    
+    ' Cycle through the three states
+    currentState = (currentState + 1) Mod 3
+    
+    Select Case currentState
+        Case 0 ' Green Check
+            CheckBox1.Caption = "✓"
+            CheckBox1.ForeColor = RGB(0, 255, 0) ' Green
+        Case 1 ' Yellow Sandglass
+            CheckBox1.Caption = "⏳"
+            CheckBox1.ForeColor = RGB(255, 255, 0) ' Yellow
+        Case 2 ' Red Cross
+            CheckBox1.Caption = "✗"
+            CheckBox1.ForeColor = RGB(255, 0, 0) ' Red
     End Select
 End Sub
