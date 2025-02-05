@@ -1,32 +1,18 @@
-Sub ReplaceDropdownWithCheckbox()
+Sub Debug_ListDropdowns()
     Dim cc As ContentControl
-    Dim newCC As ContentControl
-    Dim rng As Range
-    Dim i As Integer
+    Dim msg As String
     
-    ' Loop backward to avoid indexing issues when deleting
-    For i = ActiveDocument.ContentControls.Count To 1 Step -1
-        Set cc = ActiveDocument.ContentControls(i)
-        
-        ' Check if it's a dropdown with title "Check"
-        If cc.Type = wdContentControlDropdown And cc.Title = "Check" Then
-            ' Save the range position
-            Set rng = cc.Range
-            
-            ' Delete the old dropdown
-            cc.Delete
-            
-            ' Insert a new checkbox at the same position
-            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlCheckBox, rng)
-            
-            ' Set the title and tag to "Check1"
-            newCC.Title = "Check1"
-            newCC.Tag = "Check1"
-            
-            ' Optionally set default value (checked or unchecked)
-            newCC.Checked = False ' Change to True if you want it checked by default
+    msg = "Found the following dropdowns:" & vbCrLf & vbCrLf
+    
+    For Each cc In ActiveDocument.ContentControls
+        If cc.Type = wdContentControlDropdown Then
+            msg = msg & "Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
         End If
-    Next i
+    Next cc
     
-    MsgBox "All 'Check' dropdowns have been replaced with 'Check1' checkboxes.", vbInformation, "Process Complete"
+    If msg = "Found the following dropdowns:" & vbCrLf & vbCrLf Then
+        MsgBox "No dropdowns found!", vbExclamation, "Debug Info"
+    Else
+        MsgBox msg, vbInformation, "Dropdown List"
+    End If
 End Sub
