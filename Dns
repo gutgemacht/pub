@@ -1,31 +1,39 @@
-Sub ReplaceSecondDropdownWithFirstByTag()
+Sub ReplaceSecondDropdownWithFirst()
     Dim ccFirst As ContentControl
     Dim ccSecond As ContentControl
     Dim tagFirst As String
     Dim tagSecond As String
-
+    Dim item As DropdownListEntry
+    
     ' Specify the tags or titles you are looking for
     tagFirst = "Dropdown1"  ' Replace with the tag or title of your first dropdown
     tagSecond = "Dropdown2" ' Replace with the tag or title of your second dropdown
     
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Check if content control matches the tags
-        If cc.Tag = tagFirst Then
-            Set ccFirst = cc
-        ElseIf cc.Tag = tagSecond Then
-            Set ccSecond = cc
+        ' Ensure the content control is a dropdown list
+        If cc.Type = wdContentControlDropdownList Then
+            ' Check if content control matches the tag or title
+            If cc.Tag = tagFirst Or cc.Title = tagFirst Then
+                Set ccFirst = cc
+            ElseIf cc.Tag = tagSecond Or cc.Title = tagSecond Then
+                Set ccSecond = cc
+            End If
         End If
     Next cc
     
     ' Check if both dropdowns are found
     If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
-        ' Replace the second dropdown's items with the first one
+        ' Clear the second dropdown's items
         ccSecond.DropdownListEntries.Clear
+        
+        ' Add items from the first dropdown to the second
         For Each item In ccFirst.DropdownListEntries
             ccSecond.DropdownListEntries.Add item.Text
         Next item
+        
+        MsgBox "Dropdown menus replaced successfully."
     Else
-        MsgBox "Both dropdown menus with specified tags were not found."
+        MsgBox "Both dropdown menus with specified tags or titles were not found."
     End If
 End Sub
