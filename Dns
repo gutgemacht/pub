@@ -1,44 +1,21 @@
-Sub ReplaceCheck1WithCheckComboBox()
+Sub ListContentControlIDs()
     Dim cc As ContentControl
-    Dim newCC As ContentControl
-    Dim rng As Range
-    Dim i As Integer
+    Dim i As Long
+    Dim message As String
 
-    ' Loop through all content controls
+    ' Initialize the message to display in the MsgBox
+    message = "Content Control IDs in the document:" & vbCrLf & vbCrLf
+    
+    ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Check if it is a combo box and has Tag "Check1"
-        If cc.Type = wdContentControlComboBox And cc.Tag = "Check1" Then
-            ' Save the range of the current combo box
-            Set rng = cc.Range
-            
-            ' Save the entries from the current combo box (if any)
-            Dim oldEntries() As String
-            ReDim oldEntries(cc.DropdownEntries.Count - 1)
-            For i = 1 To cc.DropdownEntries.Count
-                oldEntries(i - 1) = cc.DropdownEntries(i).Text
-            Next i
-            
-            ' Delete the old combo box (Check1)
-            cc.Delete
-            
-            ' Insert a new combo box content control at the same position
-            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlComboBox, rng)
-            
-            ' Set the new combo box's properties
-            newCC.Title = "Check"    ' Change the title to "Check"
-            newCC.Tag = "Check"      ' Change the tag to "Check"
-            
-            ' Add the saved entries back into the new combo box
-            For i = 0 To UBound(oldEntries)
-                newCC.DropdownEntries.Add oldEntries(i)
-            Next i
-            
-            ' Exit the loop after replacing the first matching "Check1" combo box
-            MsgBox "Combo Box with Tag 'Check1' has been replaced with 'Check'.", vbInformation, "Replacement Complete"
-            Exit Sub
-        End If
+        message = message & "Title: " & cc.Title & ", Tag: " & cc.Tag & ", ID: " & cc.ID & vbCrLf
     Next cc
+    
+    ' If no content controls are found, notify the user
+    If message = "Content Control IDs in the document:" & vbCrLf & vbCrLf Then
+        message = "No content controls found."
+    End If
 
-    ' If no combo box with Tag 'Check1' is found
-    MsgBox "No combo box with Tag 'Check1' found.", vbExclamation, "Error"
+    ' Display all IDs in a message box
+    MsgBox message, vbInformation, "Content Control IDs"
 End Sub
