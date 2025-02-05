@@ -1,38 +1,26 @@
-Sub SetDropdownValue()
-
+Sub ListDropdownValues()
     Dim cc As ContentControl
     Dim i As Integer
-    Dim entryFound As Boolean
-    Dim targetValue As String
-    targetValue = "Option 1" ' Set this to the desired dropdown value (e.g., "Option 1")
-
-    ' Loop through each content control in the document
+    Dim output As String
+    
+    ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-
-        ' Check if the content control is a dropdown (type 3)
+        ' Check if it's a dropdown list
         If cc.Type = wdContentControlDropdown Then
-
-            entryFound = False ' Reset entry found flag for each dropdown
-
-            ' Loop through the dropdown entries to find the target value
+            output = "Dropdown Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
+            output = output & "Available Entries:" & vbCrLf
+            
+            ' Loop through all dropdown entries
             For i = 1 To cc.DropdownListEntries.Count
-                If cc.DropdownListEntries(i).Text = targetValue Then
-                    ' Set the dropdown value to the target value by selecting the entry
-                    cc.DropdownListEntries(i).Select
-                    entryFound = True
-                    Exit For ' Exit loop once the value is found and set
-                End If
+                output = output & "  " & i & ". " & cc.DropdownListEntries(i).Text & vbCrLf
             Next i
-
-            ' If the value was not found, notify the user
-            If Not entryFound Then
-                MsgBox "Value '" & targetValue & "' not found in dropdown for " & cc.Title, vbExclamation, "Dropdown Value Not Found"
-            End If
-
+            
+            output = output & String(40, "-") ' Separator for clarity
+            
+            ' Print to Immediate Window (Ctrl + G to view)
+            Debug.Print output
         End If
-
     Next cc
-
-    MsgBox "All dropdowns have been set to the value '" & targetValue & "'.", vbInformation, "Dropdowns Updated"
-
+    
+    MsgBox "Dropdown list details have been printed to the Immediate Window.", vbInformation, "Process Complete"
 End Sub
