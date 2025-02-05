@@ -1,38 +1,28 @@
-Sub SelectSpecificDropdownValue()
+Sub ResetDropdownValue()
     Dim ff As FormField
     Dim dropdownName As String
-    Dim specificValue As String
-    Dim i As Integer
-    Dim found As Boolean
-
-    ' Define the name of the dropdown FormField and the value to select
+    
+    ' Define the name of the dropdown FormField you want to reset
     dropdownName = "YourDropdownName"  ' Replace with the name of your dropdown
-    specificValue = "ValueToSelect"    ' Replace with the value you want to select
-
+    
     ' Loop through all FormFields in the document
     For Each ff In ActiveDocument.FormFields
         ' Check if this is a dropdown (FormField type 4)
         If ff.Type = wdFieldFormDropDown Then
             ' Check if this is the correct dropdown by name
             If ff.Name = dropdownName Then
-                found = False
-                ' Loop through the list entries to find and select the specific value
-                For i = 1 To ff.DropDown.ListEntries.Count
-                    If ff.DropDown.ListEntries(i).Value = specificValue Then
-                        ' Set the value of the dropdown to the specific entry
-                        ff.DropDown.Value = specificValue
-                        found = True
-                        Exit For
-                    End If
-                Next i
+                ' Reset the value by setting it to the first item (or any default item)
+                ff.DropDown.Value = ""  ' Set to empty value to reset
                 
-                ' If the value is found, inform the user
-                If found Then
-                    MsgBox "Selected the value '" & specificValue & "' successfully."
-                Else
-                    MsgBox "The value '" & specificValue & "' was not found in the dropdown."
-                End If
+                ' Alternatively, you can reset it to the first item in the list (if needed)
+                ' ff.DropDown.Value = ff.DropDown.ListEntries(1).Value
+                
+                MsgBox "Dropdown value has been reset."
+                Exit Sub
             End If
         End If
     Next ff
+    
+    ' If dropdown is not found
+    MsgBox "Dropdown not found."
 End Sub
