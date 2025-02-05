@@ -1,42 +1,46 @@
-Sub ReplaceSecondDropdownWithFirst()
+Sub ReplaceMultipleDropdowns()
+    Dim ccList As Collection
     Dim ccFirst As ContentControl
     Dim ccSecond As ContentControl
     Dim tagFirst As String
     Dim tagSecond As String
     Dim i As Integer
     
-    ' Specify the tags or titles you are looking for
-    tagFirst = "Dropdown1"  ' Replace with the tag or title of your first dropdown
-    tagSecond = "Dropdown2" ' Replace with the tag or title of your second dropdown
-    
-    ' Loop through all content controls in the document
+    ' Create a collection to store dropdown pairs
+    Set ccList = New Collection
+
+    ' Loop through all content controls to identify dropdowns
     For Each cc In ActiveDocument.ContentControls
-        ' Ensure the content control is a dropdown list
+        ' Only work with dropdown lists
         If cc.Type = wdContentControlDropdownList Then
-            ' Check if content control matches the tag or title
-            If cc.Tag = tagFirst Or cc.Title = tagFirst Then
-                Set ccFirst = cc
-            ElseIf cc.Tag = tagSecond Or cc.Title = tagSecond Then
-                Set ccSecond = cc
-            End If
+            ccList.Add cc
         End If
     Next cc
     
-    ' Check if both dropdowns are found
-    If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
-        ' Clear the second dropdown's items
-        ccSecond.DropdownListEntries.Clear
-        
-        ' Add items from the first dropdown to the second
-        For i = 1 To ccFirst.DropdownListEntries.Count
-            ccSecond.DropdownListEntries.Add ccFirst.DropdownListEntries(i).Text
+    ' Ensure at least two dropdowns exist in the document
+    If ccList.Count >= 2 Then
+        ' Loop through the dropdown pairs and replace them
+        For i = 1 To ccList.Count Step 2
+            ' Ensure there is a pair of dropdowns
+            If i + 1 <= ccList.Count Then
+                Set ccFirst = ccList(i)
+                Set ccSecond = ccList(i + 1)
+                
+                ' Clear the second dropdown's items
+                ccSecond.DropdownListEntries.Clear
+                
+                ' Copy items from the first dropdown to the second
+                For Each item In ccFirst.DropdownListEntries
+                    ccSecond.DropdownListEntries.Add item.Text
+                Next item
+                
+                ' Optionally select the first item in the second dropdown
+                ccSecond.DropdownListEntries(1).Select
+            End If
         Next i
-        
-        ' Ensure the second dropdown reflects the changes
-        ccSecond.DropdownListEntries(1).Select  ' Set a default selected entry if needed
         
         MsgBox "Dropdown menus replaced successfully."
     Else
-        MsgBox "Both dropdown menus with specified tags or titles were not found."
+        MsgBox "There are not enough dropdowns to replace."
     End If
 End Sub
