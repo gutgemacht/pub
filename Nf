@@ -5,8 +5,9 @@ Sub ReplaceSelectedDropdownItem()
     Dim destinationTitle As String
     Dim item As DropdownListEntry
     Dim i As Integer
-    Dim selectedIndexSource As Integer
-    Dim selectedIndexDest As Integer
+    Dim selectedTextSource As String
+    Dim selectedTextDest As String
+    Dim found As Boolean
 
     ' Define the titles of the source (pattern) and destination dropdowns
     patternTitle = "SourceDropdown"     ' Replace with the title of the source dropdown
@@ -19,23 +20,34 @@ Sub ReplaceSelectedDropdownItem()
             ' Check if this is the source (pattern) dropdown
             If cc.Title = patternTitle Then
                 Set ccFirst = cc
-                selectedIndexSource = ccFirst.DropdownListEntries(ccFirst.DropdownListEntries.Count).Index ' Default selection index
+                selectedTextSource = ccFirst.Range.Text ' Get the text of the selected item in the source dropdown
             End If
             
             ' Check if this is the destination dropdown
             If cc.Title = destinationTitle Then
                 Set ccSecond = cc
-                selectedIndexDest = ccSecond.DropdownListEntries(ccSecond.DropdownListEntries.Count).Index ' Default selection index
+                selectedTextDest = ccSecond.Range.Text ' Get the text of the selected item in the destination dropdown
             End If
         End If
     Next cc
     
     ' Ensure both source and destination dropdowns were found
     If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
-        ' Reset the selected item in the destination dropdown to the source dropdown's selection
-        ccSecond.DropdownListEntries(selectedIndexSource).Select
-        
-        MsgBox "Default selected item in destination dropdown reset successfully."
+        ' Loop through the items in the destination dropdown to find and set the same selection as the source
+        found = False
+        For i = 1 To ccSecond.DropdownListEntries.Count
+            If ccSecond.DropdownListEntries(i).Text = selectedTextSource Then
+                ccSecond.DropdownListEntries(i).Select
+                found = True
+                Exit For
+            End If
+        Next i
+
+        If found Then
+            MsgBox "Default selected item in destination dropdown reset successfully."
+        Else
+            MsgBox "The selected item from the source dropdown was not found in the destination dropdown."
+        End If
     Else
         MsgBox "Both source and destination dropdowns with specified titles were not found."
     End If
