@@ -1,17 +1,18 @@
 Private Sub CheckBox1_Click()
     Static currentState As Integer
     
-    ' Cycle through the three states
+    ' Only cycle the state when the checkbox is clicked
     currentState = (currentState + 1) Mod 3
     
+    ' Change the color based on the state
     Select Case currentState
-        Case 0 ' Green Check
+        Case 0 ' Checked (Green Check)
             CheckBox1.Caption = "✓"
             CheckBox1.ForeColor = RGB(0, 255, 0) ' Green
-        Case 1 ' Yellow Sandglass
+        Case 1 ' Indeterminate (Yellow Sandglass)
             CheckBox1.Caption = "⏳"
             CheckBox1.ForeColor = RGB(255, 255, 0) ' Yellow
-        Case 2 ' Red Cross
+        Case 2 ' Unchecked (Red Cross)
             CheckBox1.Caption = "✗"
             CheckBox1.ForeColor = RGB(255, 0, 0) ' Red
     End Select
