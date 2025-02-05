@@ -1,6 +1,7 @@
 Sub ChangeDropdownValue()
     Dim cc As ContentControl
     Dim newValue As String
+    Dim i As Integer
     Dim found As Boolean
     
     ' New value to select (change to "❌ Red Cross" or "🔵 Blue Circle")
@@ -13,10 +14,16 @@ Sub ChangeDropdownValue()
         ' Check if it's the correct dropdown by title
         If cc.Title = "StatusDropdown" Then
             found = True
-            ' Change the selected value
-            cc.DropdownListEntries.SelectByText newValue
-            MsgBox "Selected value changed to: " & newValue, vbInformation
-            Exit Sub
+            
+            ' Loop through all list entries to find the matching value
+            For i = 1 To cc.DropdownListEntries.Count
+                If cc.DropdownListEntries(i).Text = newValue Then
+                    ' Set the selected value by index
+                    cc.DropdownListEntries(i).Select
+                    MsgBox "Selected value changed to: " & newValue, vbInformation
+                    Exit Sub
+                End If
+            Next i
         End If
     Next cc
     
