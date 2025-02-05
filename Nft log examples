@@ -1,20 +1,18 @@
-Private Sub CheckBox1_Click()
-    Static currentState As Integer
-    
-    ' Cycle through the three states
-    currentState = (currentState + 1) Mod 3
-    
-    ' Get the rectangle shape (change "Rectangle 1" to the name of your shape)
-    Dim rect As Shape
-    Set rect = ActiveDocument.Shapes("Rectangle 1")
-    
-    ' Update the rectangle color based on the state
-    Select Case currentState
-        Case 0 ' Green
-            rect.Fill.ForeColor.RGB = RGB(0, 255, 0) ' Green
-        Case 1 ' Yellow
-            rect.Fill.ForeColor.RGB = RGB(255, 255, 0) ' Yellow
-        Case 2 ' Red
-            rect.Fill.ForeColor.RGB = RGB(255, 0, 0) ' Red
-    End Select
+Sub ReplaceCheckedContentControlCheckboxes()
+    Dim cc As ContentControl
+
+    ' Перебираем все элементы управления содержимым в документе
+    For Each cc In ActiveDocument.ContentControls
+        ' Проверяем, является ли элемент чекбоксом
+        If cc.Type = wdContentControlCheckBox Then
+            ' Проверяем, установлен ли чекбокс
+            If cc.Checked Then
+                ' Снимаем отметку
+                cc.Checked = False
+                ' Заменяем на символ ✗
+                cc.Range.Text = "✗"
+                cc.Range.Font.Color = wdColorRed ' Делаем крест красным
+            End If
+        End If
+    Next cc
 End Sub
