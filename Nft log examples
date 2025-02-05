@@ -1,18 +1,21 @@
 Private Sub CheckBox1_Click()
     Static currentState As Integer
     
-    ' Cycle through the three states
-    currentState = (currentState + 1) Mod 3
+    ' Перебираем состояния: 0 = Completed, 1 = Incompleted, 2 = Error, 3 = Pending
+    currentState = (currentState + 1) Mod 4
     
     Select Case currentState
-        Case 0 ' Green Check
-            CheckBox1.Caption = "✓"
-            CheckBox1.ForeColor = RGB(0, 255, 0) ' Green
-        Case 1 ' Yellow Sandglass
-            CheckBox1.Caption = "⏳"
-            CheckBox1.ForeColor = RGB(255, 255, 0) ' Yellow
-        Case 2 ' Red Cross
-            CheckBox1.Caption = "✗"
-            CheckBox1.ForeColor = RGB(255, 0, 0) ' Red
+        Case 0 ' Completed
+            CheckBox1.Caption = "✔ Completed"
+            CheckBox1.ForeColor = RGB(0, 255, 0) ' Зеленый цвет
+        Case 1 ' Incompleted
+            CheckBox1.Caption = "✘ Incompleted"
+            CheckBox1.ForeColor = RGB(255, 0, 0) ' Красный цвет
+        Case 2 ' Error
+            CheckBox1.Caption = "❌ Error"
+            CheckBox1.ForeColor = RGB(255, 165, 0) ' Оранжевый цвет
+        Case 3 ' Pending
+            CheckBox1.Caption = "⏳ Pending"
+            CheckBox1.ForeColor = RGB(255, 255, 0) ' Желтый цвет
     End Select
 End Sub
