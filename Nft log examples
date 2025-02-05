@@ -1,16 +1,36 @@
-Sub CreateCheckbox()
+Sub CreateCustomCheckbox()
     Dim cc As ContentControl
+    Static currentState As Integer
     
     ' Create a new ContentControl checkbox
     Set cc = ActiveDocument.ContentControls.Add(wdContentControlCheckBox)
     
-    ' Set the initial state of the checkbox (unchecked)
-    cc.Checked = False  ' Initial state (unchecked)
-    
     ' Set Title or Tag (optional)
-    cc.Title = "MyCheckbox"
+    cc.Title = "MyCustomCheckbox"
     cc.Tag = "CheckboxTag"
     
-    ' Add description or text (optional)
-    cc.Range.Text = "☐ My checkbox"
+    ' Set initial state to red (not checked)
+    cc.Checked = False
+    cc.Range.Text = "✗" ' Red cross
+    
+    ' Cycle through states
+    currentState = (currentState + 1) Mod 3
+    
+    ' Change state based on currentState
+    Select Case currentState
+        Case 0 ' Red Cross (not checked)
+            cc.Checked = False
+            cc.Range.Text = "✗" ' Red Cross
+            cc.Range.Font.Color = RGB(255, 0, 0) ' Red
+            
+        Case 1 ' Green Check (checked)
+            cc.Checked = True
+            cc.Range.Text = "✔" ' Green Check
+            cc.Range.Font.Color = RGB(0, 255, 0) ' Green
+            
+        Case 2 ' Hourglass (waiting)
+            cc.Checked = False
+            cc.Range.Text = "⏳" ' Hourglass symbol
+            cc.Range.Font.Color = RGB(255, 165, 0) ' Orange (for hourglass)
+    End Select
 End Sub
