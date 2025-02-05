@@ -1,8 +1,18 @@
 Sub UncheckAllCheckboxes()
     Dim chk As ContentControl
+    Dim f As FormField
+
+    ' Для современных чекбоксов (Content Controls)
     For Each chk In ActiveDocument.ContentControls
         If chk.Type = wdContentControlCheckBox Then
             chk.Checked = False
         End If
     Next chk
+
+    ' Для устаревших чекбоксов (Form Fields)
+    For Each f In ActiveDocument.FormFields
+        If f.Type = wdFieldFormCheckBox Then
+            f.CheckBox.Value = False
+        End If
+    Next f
 End Sub
