@@ -1,6 +1,9 @@
 Sub SetCheckBoxesToCross()
 
   Dim cc As ContentControl
+  Dim checkBoxCount As Long ' Counter for checkboxes found
+
+  checkBoxCount = 0 ' Initialize the counter
 
   ' Loop through each content control in the active document
   For Each cc In ActiveDocument.ContentControls
@@ -11,8 +14,13 @@ Sub SetCheckBoxesToCross()
       ' Set the checkbox value to display a cross (assuming "X" is the value for cross)
       cc.Range.Text = "X"  ' Or the appropriate value for your cross symbol
 
+      checkBoxCount = checkBoxCount + 1 ' Increment the counter
+
     End If
 
   Next cc
+
+  ' Display a message box showing the number of checkboxes found
+  MsgBox "Found and updated " & checkBoxCount & " checkbox content controls.", vbInformation, "Checkboxes Updated"
 
 End Sub
