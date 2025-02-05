@@ -1,39 +1,37 @@
-Sub CopyDropdownEntriesToAll()
+Sub CopyDropdownEntriesToTargetByTitle(sourceTitle As String, targetTitle As String)
     Dim cc As ContentControl
     Dim sourceDropdown As ContentControl
     Dim targetDropdown As ContentControl
     Dim item As ContentControlListEntry
     
-    ' Find the first dropdown list to use as the source
+    ' Find the source dropdown by title
+    Set sourceDropdown = Nothing
     For Each cc In ActiveDocument.ContentControls
-        If cc.Type = wdContentControlDropdownList Then
+        If cc.Type = wdContentControlDropdownList And cc.Title = sourceTitle Then
             Set sourceDropdown = cc
             Exit For
         End If
     Next cc
     
-    ' If no dropdown found, show a message and exit
+    ' If no source dropdown found, show a message and exit
     If sourceDropdown Is Nothing Then
-        MsgBox "No dropdown lists found in the document.", vbExclamation
+        MsgBox "Source dropdown with title '" & sourceTitle & "' not found.", vbExclamation
         Exit Sub
     End If
     
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control is a dropdown list
-        If cc.Type = wdContentControlDropdownList Then
-            ' Skip the source dropdown (we don't want to copy into itself)
-            If Not cc.Equals(sourceDropdown) Then
-                ' Clear the target dropdown entries
-                cc.DropdownListEntries.Clear
-                
-                ' Copy items from the source dropdown to the target dropdown
-                For Each item In sourceDropdown.DropdownListEntries
-                    cc.DropdownListEntries.Add item.Text
-                Next item
-            End If
+        ' Check if the content control is a dropdown list with the target title
+        If cc.Type = wdContentControlDropdownList And cc.Title = targetTitle Then
+            ' Clear the target dropdown entries
+            cc.DropdownListEntries.Clear
+            
+            ' Copy items from the source dropdown to the target dropdown
+            For Each item In sourceDropdown.DropdownListEntries
+                cc.DropdownListEntries.Add item.Text
+            Next item
         End If
     Next cc
     
-    MsgBox "Dropdown items copied to all other dropdown lists.", vbInformation
+    MsgBox "Dropdown items copied from '" & sourceTitle & "' to all dropdowns with title '" & targetTitle & "'.", vbInformation
 End Sub
