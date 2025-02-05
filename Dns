@@ -1,54 +1,36 @@
-Sub ReplaceByTitleOrTag()
+Sub ReplaceCheckWithCheck1()
     Dim cc As ContentControl
     Dim newCC As ContentControl
     Dim rng As Range
-    Dim i As Integer
-    Dim targetTitle As String
     Dim targetTag As String
+    Dim targetTitle As String
 
-    ' Specify the Title or Tag you want to search for
-    targetTitle = "Check" ' Replace with the title you want to find
-    targetTag = "Check1" ' Replace with the tag you want to find (optional, can use Title or Tag)
+    ' Set target values for the Tag and Title
+    targetTag = "Check"      ' The Tag of the content control to replace
+    targetTitle = "Check1"   ' The Title of the new content control
 
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control has the target Title or Tag
-        If cc.Title = targetTitle Or cc.Tag = targetTag Then
-            ' Save the range of the current content control
+        ' Check if the content control has the target Tag or Title
+        If cc.Tag = targetTag Then
+            ' Save the range of the current content control (the location where it is)
             Set rng = cc.Range
-            
-            ' Save the entries from the current combo box (if any)
-            If cc.Type = wdContentControlComboBox Then
-                Dim oldEntries() As String
-                ReDim oldEntries(cc.DropdownEntries.Count - 1)
-                For i = 1 To cc.DropdownEntries.Count
-                    oldEntries(i - 1) = cc.DropdownEntries(i).Text
-                Next i
-            End If
-            
+
             ' Delete the old content control
             cc.Delete
-            
-            ' Insert a new content control at the same location
+
+            ' Add a new content control of the same type (but with updated Tag and Title)
             Set newCC = ActiveDocument.ContentControls.Add(cc.Type, rng)
-            
-            ' Set the new content control's properties
-            newCC.Title = "NewTitle" ' Change to the new title you want
-            newCC.Tag = "NewTag"     ' Change to the new tag you want
-            
-            ' If it was a ComboBox, restore the entries
-            If cc.Type = wdContentControlComboBox Then
-                For i = 0 To UBound(oldEntries)
-                    newCC.DropdownEntries.Add oldEntries(i)
-                Next i
-            End If
-            
-            ' Exit the loop after replacing the first matching content control
-            MsgBox "Content control with Title '" & targetTitle & "' or Tag '" & targetTag & "' has been replaced.", vbInformation, "Replacement Complete"
-            Exit Sub
+
+            ' Set the new content control's Title and Tag
+            newCC.Tag = "Check1"    ' Set new Tag
+            newCC.Title = "Check1"  ' Set new Title
+
+            ' Optionally, you can set additional properties for the new content control here
+
         End If
     Next cc
 
-    ' If no content control with the specified Title or Tag is found
-    MsgBox "No content control with Title '" & targetTitle & "' or Tag '" & targetTag & "' found.", vbExclamation, "Error"
+    ' Notify that the process is complete
+    MsgBox "All content controls with Tag '" & targetTag & "' have been replaced with Tag '" & targetTitle & "'.", vbInformation, "Replacement Complete"
 End Sub
