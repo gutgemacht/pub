@@ -1,30 +1,43 @@
-Sub SetDropdownToCross()
+Sub ReplaceMultipleDropdownsWithTitles()
+    Dim ccList As Collection
+    Dim ccFirst As ContentControl
+    Dim ccSecond As ContentControl
+    Dim patternTitle As String
+    Dim destinationTitle As String
+    Dim i As Integer
 
-  Dim cc As ContentControl
-  Dim i As Long
+    ' Define the pattern title (source) and destination title
+    patternTitle = "SourceDropdown"     ' Replace with the title of the source dropdown
+    destinationTitle = "DestinationDropdown" ' Replace with the title of the destination dropdown
 
-  For Each cc In ActiveDocument.ContentControls
+    ' Create a collection to store dropdowns
+    Set ccList = New Collection
 
-    If cc.Type = wdContentControlDropdown Then ' Check if it's a dropdown
-
-      ' Find the index of the "X" item (case-insensitive)
-      For i = 1 To cc.DropdownEntries.Count
-        If LCase(cc.DropdownEntries(i).Text) = "x" Then ' Case-insensitive comparison
-          cc.DropdownEntries(i).Select ' Select the "X" entry
-          Exit For ' Exit the inner loop once found
+    ' Loop through all content controls to identify dropdowns
+    For Each cc In ActiveDocument.ContentControls
+        ' Only work with dropdown lists
+        If cc.Type = wdContentControlDropdownList Then
+            ccList.Add cc
         End If
-      Next i
-
-      ' If "X" was not found, you can add it (optional):
-      If i > cc.DropdownEntries.Count Then ' If the loop finished without finding "X"
-        cc.DropdownEntries.Add "X" ' Add "X" to the dropdown list
-        cc.DropdownEntries(cc.DropdownEntries.Count).Select ' Select the newly added "X"
-      End If
-
-    End If
-
-  Next cc
-
-  MsgBox "Processed dropdown content controls.", vbInformation, "Dropdowns Updated"
-
-End Sub
+    Next cc
+    
+    ' Ensure at least two dropdowns exist in the document
+    If ccList.Count >= 2 Then
+        ' Loop through the collection and replace the dropdowns with matching titles
+        For i = 1 To ccList.Count
+            Set ccFirst = ccList(i)
+            
+            ' Check if the current content control is the pattern (source)
+            If ccFirst.Title = patternTitle Then
+                For Each ccSecond In ccList
+                    ' Check if the content control is the destination
+                    If ccSecond.Title = destinationTitle Then
+                        ' Clear the destination dropdown's items
+                        ccSecond.DropdownListEntries.Clear
+                        
+                        ' Copy items from the pattern (source) dropdown to the destination dropdown
+                        For Each item In ccFirst.DropdownListEntries
+                            ccSecond.DropdownListEntries.Add item.Text
+                        Next item
+                        
+                        ' Optionally select the first
