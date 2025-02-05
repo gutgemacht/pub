@@ -1,19 +1,17 @@
 Sub GetContentControlCheckboxInfo()
     Dim cc As ContentControl
-    Dim msg As String
     
     ' Перебираем все элементы управления содержимым
     For Each cc In ActiveDocument.ContentControls
         ' Проверяем, является ли элемент чекбоксом
         If cc.Type = wdContentControlCheckBox Then
-            msg = "Title: " & cc.Title & vbCrLf & _
-                  "Tag: " & cc.Tag & vbCrLf & _
-                  "Checked: " & cc.Checked & vbCrLf & _
-                  "ID: " & cc.ID & vbCrLf & _
-                  "Range Text: " & cc.Range.Text
-            
-            ' Вывод информации в диалоговом окне
-            MsgBox msg, vbInformation, "Checkbox Info"
+            ' Выводим информацию о чекбоксе в окно отладки
+            Debug.Print "Title: " & cc.Title
+            Debug.Print "Tag: " & cc.Tag
+            Debug.Print "Checked: " & cc.Checked
+            Debug.Print "ID: " & cc.ID
+            Debug.Print "Range Text: " & cc.Range.Text
+            Debug.Print "----------------------------"
         End If
     Next cc
 End Sub
