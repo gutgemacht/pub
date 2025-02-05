@@ -1,36 +1,31 @@
-Sub ReplaceCheckWithCheck1()
-    Dim cc As ContentControl
-    Dim newCC As ContentControl
-    Dim rng As Range
-    Dim targetTag As String
-    Dim targetTitle As String
+Sub ReplaceSecondDropdownWithFirstByTag()
+    Dim ccFirst As ContentControl
+    Dim ccSecond As ContentControl
+    Dim tagFirst As String
+    Dim tagSecond As String
 
-    ' Set target values for the Tag and Title
-    targetTag = "Check"      ' The Tag of the content control to replace
-    targetTitle = "Check1"   ' The Title of the new content control
-
+    ' Specify the tags or titles you are looking for
+    tagFirst = "Dropdown1"  ' Replace with the tag or title of your first dropdown
+    tagSecond = "Dropdown2" ' Replace with the tag or title of your second dropdown
+    
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control has the target Tag or Title
-        If cc.Tag = targetTag Then
-            ' Save the range of the current content control (the location where it is)
-            Set rng = cc.Range
-
-            ' Delete the old content control
-            cc.Delete
-
-            ' Add a new content control of the same type (but with updated Tag and Title)
-            Set newCC = ActiveDocument.ContentControls.Add(cc.Type, rng)
-
-            ' Set the new content control's Title and Tag
-            newCC.Tag = "Check1"    ' Set new Tag
-            newCC.Title = "Check1"  ' Set new Title
-
-            ' Optionally, you can set additional properties for the new content control here
-
+        ' Check if content control matches the tags
+        If cc.Tag = tagFirst Then
+            Set ccFirst = cc
+        ElseIf cc.Tag = tagSecond Then
+            Set ccSecond = cc
         End If
     Next cc
-
-    ' Notify that the process is complete
-    MsgBox "All content controls with Tag '" & targetTag & "' have been replaced with Tag '" & targetTitle & "'.", vbInformation, "Replacement Complete"
+    
+    ' Check if both dropdowns are found
+    If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
+        ' Replace the second dropdown's items with the first one
+        ccSecond.DropdownListEntries.Clear
+        For Each item In ccFirst.DropdownListEntries
+            ccSecond.DropdownListEntries.Add item.Text
+        Next item
+    Else
+        MsgBox "Both dropdown menus with specified tags were not found."
+    End If
 End Sub
