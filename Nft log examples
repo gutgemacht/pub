@@ -1,18 +1,31 @@
 Sub SetCheckBoxToCross45Degrees()
     Dim cc As ContentControl
     Dim newState As Long
+    Dim foundCheckbox As Boolean
     
     ' Set the state to the desired one (cross at 45 degrees)
-    newState = 2 ' You may need to adjust this based on the exact value for "cross at 45 degrees"
+    newState = 2 ' Adjust this to the correct state value for cross at 45 degrees
+    foundCheckbox = False ' Initialize the flag to check if any checkboxes are found
     
     ' Loop through all ContentControl objects in the document
     For Each cc In ActiveDocument.ContentControls
         If cc.Type = wdContentControlCheckBox Then
             ' Check if the title or tag matches the checkbox you want
             If cc.Title = "Check" Or cc.Tag = "Check" Then
+                ' Show a message that the checkbox has been found
+                MsgBox "Found checkbox with Title: " & cc.Title & " and Tag: " & cc.Tag
+                
                 ' Set the state to "cross at 45 degrees"
                 cc.Range.FormFields(1).CheckBox.Value = newState
+                MsgBox "Changed checkbox to desired state (cross at 45 degrees)."
+                
+                foundCheckbox = True
             End If
         End If
     Next cc
+    
+    ' If no checkbox was found, show a message
+    If Not foundCheckbox Then
+        MsgBox "No checkboxes with Title or Tag 'Check' found."
+    End If
 End Sub
