@@ -19,7 +19,7 @@ Sub SelectSpecificDropdownValue()
                 ' Loop through the list entries to find and select the specific value
                 For i = 1 To ff.DropDown.ListEntries.Count
                     If ff.DropDown.ListEntries(i).Name = specificValue Then
-                        ff.DropDown.ListEntries(i).Select ' Select the item
+                        ff.DropDown.SelectedIndex = i ' Select the item by index
                         found = True
                         Exit For
                     End If
