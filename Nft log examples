@@ -1,17 +1,18 @@
-Sub GetContentControlCheckboxInfo()
-    Dim cc As ContentControl
+Private Sub CheckBox1_Click()
+    Static currentState As Integer
     
-    ' Перебираем все элементы управления содержимым
-    For Each cc In ActiveDocument.ContentControls
-        ' Проверяем, является ли элемент чекбоксом
-        If cc.Type = wdContentControlCheckBox Then
-            ' Выводим информацию о чекбоксе в окно отладки
-            Debug.Print "Title: " & cc.Title
-            Debug.Print "Tag: " & cc.Tag
-            Debug.Print "Checked: " & cc.Checked
-            Debug.Print "ID: " & cc.ID
-            Debug.Print "Range Text: " & cc.Range.Text
-            Debug.Print "----------------------------"
-        End If
-    Next cc
+    ' Cycle through the three states
+    currentState = (currentState + 1) Mod 3
+    
+    Select Case currentState
+        Case 0 ' Green Check
+            CheckBox1.Caption = "✓"
+            CheckBox1.ForeColor = RGB(0, 255, 0) ' Green
+        Case 1 ' Yellow Sandglass
+            CheckBox1.Caption = "⏳"
+            CheckBox1.ForeColor = RGB(255, 255, 0) ' Yellow
+        Case 2 ' Red Cross
+            CheckBox1.Caption = "✗"
+            CheckBox1.ForeColor = RGB(255, 0, 0) ' Red
+    End Select
 End Sub
