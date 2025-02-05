@@ -1,40 +1,8 @@
-# Log all dropped packets on the input chain
-nft add rule filter input log prefix "Dropped packet on input: " flags all drop
-
-# Log dropped TCP packets on the output chain
-nft add rule filter output ip protocol tcp drop log prefix "Dropped TCP packet on output: " flags all
-
-# Log dropped ICMP packets with specific ICMP types
-nft add rule filter input ip protocol icmp icmp type echo-request accept
-nft add rule filter input ip protocol icmp icmp type echo-reply accept
-nft add rule filter input ip protocol icmp drop log prefix "Dropped ICMP packet: " flags all
-
-# Log dropped UDP packets to a specific destination port
-nft add rule filter input ip protocol udp dport 53 accept
-nft add rule filter input ip protocol udp drop log prefix "Dropped UDP packet to port 53: " flags all
-
-# Log dropped packets from a specific IP address
-nft add rule filter input ip saddr 192.168.1.100 accept
-nft add rule filter input ip drop log prefix "Dropped packet from 192.168.1.100: " flags all
-
-# Log dropped packets to a specific MAC address
-nft add rule filter input ether saddr aa:bb:cc:dd:ee:ff accept
-nft add rule filter input ether drop log prefix "Dropped packet to MAC aa:bb:cc:dd:ee:ff: " flags all
-
-# Log dropped packets with a specific TCP flag
-nft add rule filter input ip protocol tcp tcp flags .syn accept
-nft add rule filter input ip protocol tcp drop log prefix "Dropped packet with non-SYN flag: " flags all
-
-# Log dropped packets exceeding a specific size
-nft add rule filter input meta packet length <= 1500 accept
-nft add rule filter input meta drop log prefix "Dropped oversized packet: " flags all
-
-# Log dropped packets with a specific interface
-nft add rule filter input iif eth0 accept
-nft add rule filter input iif drop log prefix "Dropped packet on interface: " flags all
-
-# Log dropped packets with a specific protocol
-nft add rule filter input ip protocol tcp accept
-nft add rule filter input ip protocol udp accept
-nft add rule filter input ip protocol icmp accept
-nft add rule filter input ip drop log prefix "Dropped packet with unknown protocol: " flags all
+Sub UncheckAllCheckboxes()
+    Dim chk As ContentControl
+    For Each chk In ActiveDocument.ContentControls
+        If chk.Type = wdContentControlCheckBox Then
+            chk.Checked = False
+        End If
+    Next chk
+End Sub
