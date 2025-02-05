@@ -39,3 +39,9 @@ Sub CopyDropdownEntriesToTargetByTitle(sourceTitle As String, targetTitle As Str
     ' Show a message confirming that the entries have been copied
     MsgBox "Dropdown items copied from '" & sourceTitle & "' to all dropdowns with title '" & targetTitle & "'.", vbInformation
 End Sub
+
+Sub TestCopyDropdownEntries()
+    ' This is where you specify the titles of the source and target dropdowns.
+    ' Replace with your dropdown titles.
+    Call CopyDropdownEntriesToTargetByTitle("SourceDropdown", "TargetDropdown")
+End Sub
