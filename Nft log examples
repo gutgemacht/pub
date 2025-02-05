@@ -11,13 +11,17 @@ Sub ChangeAllCheckBoxes()
     ' Loop through all ContentControl objects in the document
     For Each cc In ActiveDocument.ContentControls
         If cc.Type = wdContentControlCheckBox Then
-            ' Debugging: Show the Title and Tag of each ContentControl
-            MsgBox "Title: " & cc.Title & ", Tag: " & cc.Tag
-            
             ' Check if the title or tag matches
-            If cc.Title = "check" Or cc.Tag = "check" Then
-                cc.Checked = (newState = 1) ' If newState = 1, set it to "Checked"
-                MsgBox "Changed checkbox state!" ' Confirmation message
+            If cc.Title = "Check" Or cc.Tag = "Check" Then
+                ' Change the state based on newState
+                Select Case newState
+                    Case 1 ' Checked
+                        cc.Range.FormFields(1).CheckBox.Value = True
+                    Case 2 ' Unchecked
+                        cc.Range.FormFields(1).CheckBox.Value = False
+                    Case 3 ' Not defined (if needed, use default or leave empty)
+                        cc.Range.FormFields(1).CheckBox.Value = wdUndefined
+                End Select
             End If
         End If
     Next cc
