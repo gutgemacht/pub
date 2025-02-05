@@ -4,7 +4,7 @@ Sub SetDropdownValue()
     Dim i As Integer
     Dim entryFound As Boolean
     Dim targetValue As String
-    targetValue = "Option 1" ' Set this to the desired value
+    targetValue = "Option 1" ' Set this to the desired dropdown value (e.g., "Option 1")
 
     ' Loop through each content control in the document
     For Each cc In ActiveDocument.ContentControls
@@ -17,7 +17,7 @@ Sub SetDropdownValue()
             ' Loop through the dropdown entries to find the target value
             For i = 1 To cc.DropdownListEntries.Count
                 If cc.DropdownListEntries(i).Text = targetValue Then
-                    ' Set the value by selecting the appropriate entry
+                    ' Set the dropdown value to the target value by selecting the entry
                     cc.DropdownListEntries(i).Select
                     entryFound = True
                     Exit For ' Exit loop once the value is found and set
