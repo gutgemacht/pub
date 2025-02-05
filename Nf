@@ -1,10 +1,9 @@
-Sub ReplaceSelectedDropdownItem()
-    Dim ffFirst As FormField
-    Dim ffSecond As FormField
+Sub CopySelectedValueFromDropdown()
+    Dim ffSource As FormField
+    Dim ffDestination As FormField
     Dim patternTitle As String
     Dim destinationTitle As String
-    Dim selectedTextSource As String
-    Dim selectedTextDest As String
+    Dim selectedItem As String
     Dim i As Integer
     Dim found As Boolean
 
@@ -18,32 +17,34 @@ Sub ReplaceSelectedDropdownItem()
         If ff.Type = wdFieldFormDropDown Then
             ' Check if this is the source (pattern) dropdown
             If ff.Title = patternTitle Then
-                Set ffFirst = ff
-                selectedTextSource = ffFirst.DropDown.SelectedItem ' Get the text of the selected item in the source dropdown
+                Set ffSource = ff
+                selectedItem = ffSource.DropDown.SelectedItem ' Get the selected item in the source dropdown
             End If
             
             ' Check if this is the destination dropdown
             If ff.Title = destinationTitle Then
-                Set ffSecond = ff
-                selectedTextDest = ffSecond.DropDown.SelectedItem ' Get the text of the selected item in the destination dropdown
+                Set ffDestination = ff
             End If
         End If
     Next ff
     
     ' Ensure both source and destination dropdowns were found
-    If Not ffFirst Is Nothing And Not ffSecond Is Nothing Then
-        ' Loop through the items in the destination dropdown to find and set the same selection as the source
+    If Not ffSource Is Nothing And Not ffDestination Is Nothing Then
+        ' Reset the destination dropdown (remove selection)
+        ffDestination.DropDown.ListEntries(1).Select ' Reset to the first item in the destination dropdown
+
+        ' Loop through the items in the destination dropdown to find the same selected item as the source
         found = False
-        For i = 1 To ffSecond.DropDown.ListEntries.Count
-            If ffSecond.DropDown.ListEntries(i).Name = selectedTextSource Then
-                ffSecond.DropDown.ListEntries(i).Select
+        For i = 1 To ffDestination.DropDown.ListEntries.Count
+            If ffDestination.DropDown.ListEntries(i).Name = selectedItem Then
+                ffDestination.DropDown.ListEntries(i).Select ' Set the same selected item in the destination dropdown
                 found = True
                 Exit For
             End If
         Next i
 
         If found Then
-            MsgBox "Default selected item in destination dropdown reset successfully."
+            MsgBox "Selected value copied successfully."
         Else
             MsgBox "The selected item from the source dropdown was not found in the destination dropdown."
         End If
