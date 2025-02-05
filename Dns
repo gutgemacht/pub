@@ -1,21 +1,54 @@
-Sub ListContentControlIDs()
+Sub ReplaceByTitleOrTag()
     Dim cc As ContentControl
-    Dim i As Long
-    Dim message As String
+    Dim newCC As ContentControl
+    Dim rng As Range
+    Dim i As Integer
+    Dim targetTitle As String
+    Dim targetTag As String
 
-    ' Initialize the message to display in the MsgBox
-    message = "Content Control IDs in the document:" & vbCrLf & vbCrLf
-    
+    ' Specify the Title or Tag you want to search for
+    targetTitle = "Check" ' Replace with the title you want to find
+    targetTag = "Check1" ' Replace with the tag you want to find (optional, can use Title or Tag)
+
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        message = message & "Title: " & cc.Title & ", Tag: " & cc.Tag & ", ID: " & cc.ID & vbCrLf
+        ' Check if the content control has the target Title or Tag
+        If cc.Title = targetTitle Or cc.Tag = targetTag Then
+            ' Save the range of the current content control
+            Set rng = cc.Range
+            
+            ' Save the entries from the current combo box (if any)
+            If cc.Type = wdContentControlComboBox Then
+                Dim oldEntries() As String
+                ReDim oldEntries(cc.DropdownEntries.Count - 1)
+                For i = 1 To cc.DropdownEntries.Count
+                    oldEntries(i - 1) = cc.DropdownEntries(i).Text
+                Next i
+            End If
+            
+            ' Delete the old content control
+            cc.Delete
+            
+            ' Insert a new content control at the same location
+            Set newCC = ActiveDocument.ContentControls.Add(cc.Type, rng)
+            
+            ' Set the new content control's properties
+            newCC.Title = "NewTitle" ' Change to the new title you want
+            newCC.Tag = "NewTag"     ' Change to the new tag you want
+            
+            ' If it was a ComboBox, restore the entries
+            If cc.Type = wdContentControlComboBox Then
+                For i = 0 To UBound(oldEntries)
+                    newCC.DropdownEntries.Add oldEntries(i)
+                Next i
+            End If
+            
+            ' Exit the loop after replacing the first matching content control
+            MsgBox "Content control with Title '" & targetTitle & "' or Tag '" & targetTag & "' has been replaced.", vbInformation, "Replacement Complete"
+            Exit Sub
+        End If
     Next cc
-    
-    ' If no content controls are found, notify the user
-    If message = "Content Control IDs in the document:" & vbCrLf & vbCrLf Then
-        message = "No content controls found."
-    End If
 
-    ' Display all IDs in a message box
-    MsgBox message, vbInformation, "Content Control IDs"
+    ' If no content control with the specified Title or Tag is found
+    MsgBox "No content control with Title '" & targetTitle & "' or Tag '" & targetTag & "' found.", vbExclamation, "Error"
 End Sub
