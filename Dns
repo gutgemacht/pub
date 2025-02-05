@@ -1,18 +1,39 @@
-Sub Debug_ListDropdowns()
+Sub Debug_ListAllContentControls()
     Dim cc As ContentControl
     Dim msg As String
+    Dim controlType As String
     
-    msg = "Found the following dropdowns:" & vbCrLf & vbCrLf
+    msg = "Found the following content controls:" & vbCrLf & vbCrLf
     
     For Each cc In ActiveDocument.ContentControls
-        If cc.Type = wdContentControlDropdown Then
-            msg = msg & "Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
-        End If
+        ' Determine the content control type
+        Select Case cc.Type
+            Case wdContentControlText
+                controlType = "Text"
+            Case wdContentControlRichText
+                controlType = "Rich Text"
+            Case wdContentControlDropdown
+                controlType = "Dropdown List"
+            Case wdContentControlComboBox
+                controlType = "ComboBox"
+            Case wdContentControlCheckBox
+                controlType = "Checkbox"
+            Case wdContentControlDate
+                controlType = "Date Picker"
+            Case wdContentControlBuildingBlockGallery
+                controlType = "Building Block"
+            Case wdContentControlRepeatingSection
+                controlType = "Repeating Section"
+            Case wdContentControlGroup
+                controlType = "Group"
+            Case Else
+                controlType = "Unknown"
+        End Select
+        
+        msg = msg & "Type: " & controlType & " | Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
     Next cc
     
-    If msg = "Found the following dropdowns:" & vbCrLf & vbCrLf Then
-        MsgBox "No dropdowns found!", vbExclamation, "Debug Info"
+    If msg = "Found the following content controls:" & vbCrLf & vbCrLf Then
+        MsgBox "No content controls found!", vbExclamation, "Debug Info"
     Else
-        MsgBox msg, vbInformation, "Dropdown List"
-    End If
-End Sub
+        MsgBox msg, vbInformation, "Content Controls List
