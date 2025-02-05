@@ -1,26 +1,16 @@
-Sub RemoveAllChecks()
-    Dim shp As InlineShape
-    Dim r As Range
-
-    ' Снять галочки из ActiveX и Content Controls
-    Dim chk As ContentControl
-    For Each chk In ActiveDocument.ContentControls
-        If chk.Type = wdContentControlCheckBox Then
-            chk.Checked = False
-        End If
-    Next chk
-
-    ' Снять галочки из старых форм (Form Fields)
-    Dim f As FormField
-    For Each f In ActiveDocument.FormFields
-        If f.Type = wdFieldFormCheckBox Then
-            f.CheckBox.Value = False
-        End If
-    Next f
-
-    ' Удалить символы галочек (если они вставлены вручную)
-    For Each r In ActiveDocument.StoryRanges
-        r.Find.Execute FindText:="☑", ReplaceWith:="□", Replace:=wdReplaceAll
-        r.Find.Execute FindText:="■", ReplaceWith:="□", Replace:=wdReplaceAll
-    Next r
+Sub ChangeCheckboxState()
+    Dim cb As Object
+    Set cb = ActiveDocument.Shapes("CheckBox1").OLEFormat.Object ' Name of your checkbox
+    
+    ' Change the state and color of the checkbox
+    If cb.Value = 0 Then
+        cb.Value = 1 ' Set checked state
+        cb.ForeColor.RGB = RGB(0, 255, 0) ' Green color (checkmark)
+    ElseIf cb.Value = 1 Then
+        cb.Value = 2 ' Set indeterminate state
+        cb.ForeColor.RGB = RGB(255, 255, 0) ' Yellow (Hourglass)
+    ElseIf cb.Value = 2 Then
+        cb.Value = 0 ' Set unchecked state
+        cb.ForeColor.RGB = RGB(255, 0, 0) ' Red color (Cross)
+    End If
 End Sub
