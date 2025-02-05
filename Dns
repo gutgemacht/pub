@@ -1,12 +1,10 @@
 Sub ReplaceMultipleDropdowns()
+    Dim cc As ContentControl
     Dim ccList As Collection
-    Dim ccFirst As ContentControl
-    Dim ccSecond As ContentControl
-    Dim tagFirst As String
-    Dim tagSecond As String
     Dim i As Integer
+    Dim item As DropdownListEntry
     
-    ' Create a collection to store dropdown pairs
+    ' Create a collection to store dropdowns
     Set ccList = New Collection
 
     ' Loop through all content controls to identify dropdowns
@@ -17,30 +15,30 @@ Sub ReplaceMultipleDropdowns()
         End If
     Next cc
     
-    ' Ensure at least two dropdowns exist in the document
-    If ccList.Count >= 2 Then
-        ' Loop through the dropdown pairs and replace them
-        For i = 1 To ccList.Count Step 2
-            ' Ensure there is a pair of dropdowns
-            If i + 1 <= ccList.Count Then
-                Set ccFirst = ccList(i)
-                Set ccSecond = ccList(i + 1)
-                
-                ' Clear the second dropdown's items
-                ccSecond.DropdownListEntries.Clear
-                
-                ' Copy items from the first dropdown to the second
-                For Each item In ccFirst.DropdownListEntries
-                    ccSecond.DropdownListEntries.Add item.Text
-                Next item
-                
-                ' Optionally select the first item in the second dropdown
-                ccSecond.DropdownListEntries(1).Select
+    ' Ensure there are dropdowns to replace
+    If ccList.Count >= 1 Then
+        ' Loop through all dropdowns and copy entries to the next one
+        For i = 1 To ccList.Count - 1
+            ' Get the current dropdown and the next one
+            Set ccFirst = ccList(i)
+            Set ccSecond = ccList(i + 1)
+            
+            ' Clear the second dropdown's items
+            ccSecond.DropdownListEntries.Clear
+            
+            ' Copy items from the first dropdown to the second
+            For Each item In ccFirst.DropdownListEntries
+                ccSecond.DropdownListEntries.Add item.Text
+            Next item
+            
+            ' Optionally set the same selected value in the second dropdown
+            If ccFirst.DropdownListEntries.Count > 0 Then
+                ccSecond.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)))).Select
             End If
         Next i
         
-        MsgBox "Dropdown menus replaced successfully."
+        MsgBox "Dropdown menus updated successfully."
     Else
-        MsgBox "There are not enough dropdowns to replace."
+        MsgBox "No dropdown menus found."
     End If
 End Sub
