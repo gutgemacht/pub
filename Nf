@@ -1,25 +1,21 @@
-Sub CreateDropdown()
-    Dim fld As FormField
-    Dim rng As Range
+Sub CreateComboBox()
+    Dim cb As ContentControl
     
-    ' Set the position in the document
-    Set rng = Selection.Range
+    ' Insert a ComboBox Content Control at the cursor position
+    Set cb = ActiveDocument.ContentControls.Add(wdContentControlDropdownList)
     
-    ' Add a dropdown list (DropDown)
-    Set fld = ActiveDocument.FormFields.Add(rng, wdFieldFormDropDown)
+    ' Set the title (name) of the dropdown
+    cb.Title = "StatusDropdown"
     
-    ' Set the field name (can be used for finding it later)
-    fld.Name = "StatusDropdown"
-    
-    ' Add three possible options
-    With fld.DropDown.ListEntries
+    ' Add three options to the dropdown
+    With cb.DropdownListEntries
         .Add "✅ Green Checkmark"
         .Add "❌ Red Cross"
         .Add "🔵 Blue Circle"
     End With
     
-    ' Set the default value (e.g., the blue circle)
-    fld.DropDown.Value = "🔵 Blue Circle"
+    ' Set the default value (e.g., blue circle)
+    cb.DropdownListEntries(3).Select
     
     MsgBox "Dropdown list created!", vbInformation
 End Sub
