@@ -1,29 +1,35 @@
 Sub SetDropdownToCross()
 
   Dim cc As ContentControl
-  Dim entry As ContentControlListEntry
-  Dim found As Boolean ' Flag to track if "X" is found
+  Dim i As Long
 
   For Each cc In ActiveDocument.ContentControls
 
     If cc.Type = wdContentControlDropdown Then
 
-      found = False ' Reset the flag for each dropdown
+      ' Loop through the dropdown entries (by index)
+      For i = 1 To cc.DropdownEntries.Count
 
-      For Each entry In cc.DropdownEntries  ' Correct way to loop through entries
+        ' Case-insensitive comparison of entry text
+        If LCase(cc.DropdownEntries(i).Text) = "x" Then
 
-        If LCase(entry.Text) = "x" Then
-          entry.Select
-          found = True
-          Exit For ' Exit inner loop once "X" is found
+          ' Set the dropdown value by index (this is the correct way)
+          cc.Range.Text = cc.DropdownEntries(i).Text
+          Exit For ' Important: Exit the loop once found
+
         End If
 
-      Next entry
+      Next i
 
-      ' If "X" was not found, add it (optional):
-      If Not found Then ' More readable way to check the flag
+      ' If "X" was not found AND the dropdown is not locked, add it
+      If i > cc.DropdownEntries.Count And Not cc.Locked Then
+
+        ' Add the "X" entry (this is where I made the mistake before)
         cc.DropdownEntries.Add "X"
-        cc.DropdownEntries(cc.DropdownEntries.Count).Select
+
+        ' Select the newly added "X" by its index
+        cc.Range.Text = "X" ' Or: cc.DropdownEntries(cc.DropdownEntries.Count).Text
+
       End If
 
     End If
