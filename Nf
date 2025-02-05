@@ -1,31 +1,30 @@
-Sub SetSymbolCheckBoxesToCross()
+Sub SetDropdownToCross()
 
-  Dim strFind As String
-  Dim strReplace As String
+  Dim cc As ContentControl
+  Dim i As Long
 
-  ' Set the character code for the checkbox you want to replace (find it in the Symbol dialog)
-  strFind = "^u" & "00A3"  ' Example: Wingdings checkbox (replace with your code)
+  For Each cc In ActiveDocument.ContentControls
 
-  ' Set the character code for the cross symbol you want to use (in the same font)
-  strReplace = "^u" & "00A5"  ' Example: Wingdings cross (replace with your code)
+    If cc.Type = wdContentControlDropdown Then ' Check if it's a dropdown
 
-  ' Use Find and Replace to replace all instances
-  With Selection.Find
-    .ClearFormatting
-    .Replacement.ClearFormatting
-    .Text = strFind
-    .Replacement.Text = strReplace
-    .Forward = True
-    .Wrap = wdWrapContinue
-    .Format = False
-    .MatchCase = False
-    .MatchWholeWord = False
-    .MatchWildcards = False
-    .MatchSoundsLike = False
-    .MatchAllWordForms = False
-    .Execute Replace:=wdReplaceAll
-  End With
+      ' Find the index of the "X" item (case-insensitive)
+      For i = 1 To cc.DropdownEntries.Count
+        If LCase(cc.DropdownEntries(i).Text) = "x" Then ' Case-insensitive comparison
+          cc.DropdownEntries(i).Select ' Select the "X" entry
+          Exit For ' Exit the inner loop once found
+        End If
+      Next i
 
-  MsgBox "Replaced all instances of the checkbox symbol.", vbInformation, "Checkboxes Updated"
+      ' If "X" was not found, you can add it (optional):
+      If i > cc.DropdownEntries.Count Then ' If the loop finished without finding "X"
+        cc.DropdownEntries.Add "X" ' Add "X" to the dropdown list
+        cc.DropdownEntries(cc.DropdownEntries.Count).Select ' Select the newly added "X"
+      End If
+
+    End If
+
+  Next cc
+
+  MsgBox "Processed dropdown content controls.", vbInformation, "Dropdowns Updated"
 
 End Sub
