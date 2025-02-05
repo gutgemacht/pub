@@ -1,6 +1,6 @@
 Sub ReplaceSelectedDropdownItem()
-    Dim ccFirst As ContentControl
-    Dim ccSecond As ContentControl
+    Dim ffFirst As FormField
+    Dim ffSecond As FormField
     Dim patternTitle As String
     Dim destinationTitle As String
     Dim selectedTextSource As String
@@ -12,31 +12,31 @@ Sub ReplaceSelectedDropdownItem()
     patternTitle = "SourceDropdown"     ' Replace with the title of the source dropdown
     destinationTitle = "DestinationDropdown" ' Replace with the title of the destination dropdown
 
-    ' Loop through all content controls in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Ensure the content control is a dropdown list and matches the pattern title
-        If cc.Type = wdContentControlDropdownList Then
+    ' Loop through all FormFields in the document
+    For Each ff In ActiveDocument.FormFields
+        ' Check if this is the source (pattern) dropdown (FormField type 4 is a dropdown)
+        If ff.Type = wdFieldFormDropDown Then
             ' Check if this is the source (pattern) dropdown
-            If cc.Title = patternTitle Then
-                Set ccFirst = cc
-                selectedTextSource = ccFirst.Range.Text ' Get the text of the selected item in the source dropdown
+            If ff.Title = patternTitle Then
+                Set ffFirst = ff
+                selectedTextSource = ffFirst.DropDown.SelectedItem ' Get the text of the selected item in the source dropdown
             End If
             
             ' Check if this is the destination dropdown
-            If cc.Title = destinationTitle Then
-                Set ccSecond = cc
-                selectedTextDest = ccSecond.Range.Text ' Get the text of the selected item in the destination dropdown
+            If ff.Title = destinationTitle Then
+                Set ffSecond = ff
+                selectedTextDest = ffSecond.DropDown.SelectedItem ' Get the text of the selected item in the destination dropdown
             End If
         End If
-    Next cc
+    Next ff
     
     ' Ensure both source and destination dropdowns were found
-    If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
+    If Not ffFirst Is Nothing And Not ffSecond Is Nothing Then
         ' Loop through the items in the destination dropdown to find and set the same selection as the source
         found = False
-        For i = 1 To ccSecond.DropdownListEntries.Count
-            If ccSecond.DropdownListEntries(i).Text = selectedTextSource Then
-                ccSecond.DropdownListEntries(i).Select
+        For i = 1 To ffSecond.DropDown.ListEntries.Count
+            If ffSecond.DropDown.ListEntries(i).Name = selectedTextSource Then
+                ffSecond.DropDown.ListEntries(i).Select
                 found = True
                 Exit For
             End If
