@@ -1,38 +1,38 @@
 Sub SetDropdownValue()
 
-  Dim cc As ContentControl
-  Dim i As Integer
-  Dim entryFound As Boolean
-  Dim targetValue As String
-  targetValue = "Option 1" ' Set this to the desired dropdown value (e.g., "Option 1")
+    Dim cc As ContentControl
+    Dim i As Integer
+    Dim entryFound As Boolean
+    Dim targetValue As String
+    targetValue = "Option 1" ' Set this to the desired value
 
-  ' Loop through each content control in the document
-  For Each cc In ActiveDocument.ContentControls
+    ' Loop through each content control in the document
+    For Each cc In ActiveDocument.ContentControls
 
-    ' Check if the content control is a dropdown (type 3)
-    If cc.Type = wdContentControlDropdown Then
+        ' Check if the content control is a dropdown (type 3)
+        If cc.Type = wdContentControlDropdown Then
 
-      entryFound = False ' Reset entry found flag for each dropdown
+            entryFound = False ' Reset entry found flag for each dropdown
 
-      ' Loop through the dropdown entries to find the target value
-      For i = 1 To cc.DropdownEntries.Count
-        If cc.DropdownEntries(i).Text = targetValue Then
-          ' Set the value by selecting the appropriate entry
-          cc.DropdownListEntries(i).Select
-          entryFound = True
-          Exit For ' Exit loop once the value is found and set
+            ' Loop through the dropdown entries to find the target value
+            For i = 1 To cc.DropdownListEntries.Count
+                If cc.DropdownListEntries(i).Text = targetValue Then
+                    ' Set the value by selecting the appropriate entry
+                    cc.DropdownListEntries(i).Select
+                    entryFound = True
+                    Exit For ' Exit loop once the value is found and set
+                End If
+            Next i
+
+            ' If the value was not found, notify the user
+            If Not entryFound Then
+                MsgBox "Value '" & targetValue & "' not found in dropdown for " & cc.Title, vbExclamation, "Dropdown Value Not Found"
+            End If
+
         End If
-      Next i
 
-      ' If the value was not found, notify the user
-      If Not entryFound Then
-        MsgBox "Value '" & targetValue & "' not found in dropdown for " & cc.Title, vbExclamation, "Dropdown Value Not Found"
-      End If
+    Next cc
 
-    End If
-
-  Next cc
-
-  MsgBox "All dropdowns have been set to the value '" & targetValue & "'.", vbInformation, "Dropdowns Updated"
+    MsgBox "All dropdowns have been set to the value '" & targetValue & "'.", vbInformation, "Dropdowns Updated"
 
 End Sub
