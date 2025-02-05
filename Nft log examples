@@ -1,16 +1,19 @@
-Sub ReplaceCheckedContentControlCheckboxes()
+Sub GetContentControlCheckboxInfo()
     Dim cc As ContentControl
-
+    Dim msg As String
+    
     ' Перебираем все элементы управления содержимым
     For Each cc In ActiveDocument.ContentControls
         ' Проверяем, является ли элемент чекбоксом
         If cc.Type = wdContentControlCheckBox Then
-            ' Проверяем, отмечен ли чекбокс
-            If cc.Checked Then
-                ' Изменяем символ для отмеченного чекбокса на ✗
-                cc.CheckedSymbol = "✗"
-                cc.Checked = True ' Применяем новый символ
-            End If
+            msg = "Title: " & cc.Title & vbCrLf & _
+                  "Tag: " & cc.Tag & vbCrLf & _
+                  "Checked: " & cc.Checked & vbCrLf & _
+                  "ID: " & cc.ID & vbCrLf & _
+                  "Range Text: " & cc.Range.Text
+            
+            ' Вывод информации в диалоговом окне
+            MsgBox msg, vbInformation, "Checkbox Info"
         End If
     Next cc
 End Sub
