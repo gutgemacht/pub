@@ -1,30 +1,30 @@
-Sys*fw
+Sub SetDropdownToCross()
 
-# Flush any existing rules
-nft flush ruleset
+  Dim cc As ContentControl
+  Dim i As Long
 
-# Create the table and chains
-nft add table inet filter
-nft add chain inet filter input { type filter hook input priority 0 \; policy drop \; }
-nft add chain inet filter forward { type filter hook forward priority 0 \; policy drop \; }
-nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
+  For Each cc In ActiveDocument.ContentControls
 
-# Allow local traffic
-nft add rule inet filter input iif lo accept
-nft add rule inet filter output oif lo accept
+    If cc.Type = wdContentControlDropdown Then ' Check if it's a dropdown
 
-# Allow established/related traffic
-nft add rule inet filter forward state established,related accept
+      ' Find the index of the "X" item (case-insensitive)
+      For i = 1 To cc.DropdownEntries.Count
+        If LCase(cc.DropdownEntries(i).Text) = "x" Then ' Case-insensitive comparison
+          cc.DropdownEntries(i).Select ' Select the "X" entry
+          Exit For ' Exit the inner loop once found
+        End If
+      Next i
 
-# Allow specific AppVM outbound traffic (e.g., 443 for HTTPS)
-nft add rule inet filter forward iif "vif*" oif eth0 tcp dport { 80, 443 } accept
+      ' If "X" was not found, you can add it (optional):
+      If i > cc.DropdownEntries.Count Then ' If the loop finished without finding "X"
+        cc.DropdownEntries.Add "X" ' Add "X" to the dropdown list
+        cc.DropdownEntries(cc.DropdownEntries.Count).Select ' Select the newly added "X"
+      End If
 
-# Allow ICMP
-nft add rule inet filter input ip protocol icmp accept
-nft add rule inet filter output ip protocol icmp accept
+    End If
 
-# Drop all other forward traffic
-nft add rule inet filter forward drop
+  Next cc
 
-# Save the configuration
-nft list ruleset > /etc/nftables.conf
+  MsgBox "Processed dropdown content controls.", vbInformation, "Dropdowns Updated"
+
+End Sub
