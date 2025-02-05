@@ -1,16 +1,48 @@
-Sub Debug_ShowContentControlTypes()
+Sub ReplaceCheckWithCheck1()
     Dim cc As ContentControl
-    Dim msg As String
+    Dim newCC As ContentControl
+    Dim rng As Range
+    Dim refCC As ContentControl
+    Dim foundRef As Boolean
+    Dim i As Integer
 
-    msg = "Found the following content controls:" & vbCrLf & vbCrLf
+    ' Find a reference checkbox with Title "Check1" (used for copying properties)
+    foundRef = False
+    For Each refCC In ActiveDocument.ContentControls
+        If refCC.Type = wdContentControlCheckBox And refCC.Title = "Check1" Then
+            foundRef = True
+            Exit For
+        End If
+    Next refCC
 
-    For Each cc In ActiveDocument.ContentControls
-        msg = msg & "Type ID: " & cc.Type & " | Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
-    Next cc
-
-    If msg = "Found the following content controls:" & vbCrLf & vbCrLf Then
-        MsgBox "No content controls found!", vbExclamation, "Debug Info"
-    Else
-        MsgBox msg, vbInformation, "Content Controls Type IDs"
+    ' If no "Check1" checkbox exists, stop and show an error
+    If Not foundRef Then
+        MsgBox "No checkbox with Title 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
+        Exit Sub
     End If
+
+    ' Loop backwards to prevent index shifting
+    For i = ActiveDocument.ContentControls.Count To 1 Step -1
+        Set cc = ActiveDocument.ContentControls(i)
+
+        ' If it's a checkbox with Title "Check"
+        If cc.Type = wdContentControlCheckBox And cc.Title = "Check" Then
+            ' Save its position before deleting
+            Set rng = cc.Range
+
+            ' Delete the old checkbox
+            cc.Delete
+
+            ' Insert a new checkbox at the same position
+            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlCheckBox, rng)
+
+            ' Copy properties from "Check1"
+            newCC.Title = refCC.Title
+            newCC.Tag = refCC.Tag
+            newCC.Checked = refCC.Checked ' Copy the check state
+
+        End If
+    Next i
+
+    MsgBox "All 'Check' checkboxes have been replaced with 'Check1'.", vbInformation, "Process Complete"
 End Sub
