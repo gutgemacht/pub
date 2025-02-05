@@ -11,7 +11,10 @@ Sub ChangeAllCheckBoxes()
     ' Loop through all ContentControl objects in the document
     For Each cc In ActiveDocument.ContentControls
         If cc.Type = wdContentControlCheckBox Then
-            cc.Checked = (newState = 1) ' If newState = 1, set it to "Checked"
+            ' Check if the title or tag matches
+            If cc.Title = "check" Or cc.Tag = "check" Then
+                cc.Checked = (newState = 1) ' If newState = 1, set it to "Checked"
+            End If
         End If
     Next cc
 End Sub
