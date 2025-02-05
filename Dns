@@ -1,47 +1,34 @@
-Sub CopyDropdownEntriesToTargetByTitle(sourceTitle As String, targetTitle As String)
+Sub ChangeAllDropdowns()
     Dim cc As ContentControl
-    Dim sourceDropdown As ContentControl
-    Dim targetDropdown As ContentControl
-    Dim item As ContentControlListEntry
-    
-    ' Initialize the sourceDropdown to Nothing
-    Set sourceDropdown = Nothing
-    
-    ' Find the source dropdown by title
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control is a dropdown and has the correct title
-        If cc.Type = wdContentControlDropdownList And cc.Title = sourceTitle Then
-            Set sourceDropdown = cc
-            Exit For ' Exit once the source dropdown is found
-        End If
-    Next cc
-    
-    ' If no source dropdown is found, show a message and exit the macro
-    If sourceDropdown Is Nothing Then
-        MsgBox "Source dropdown with title '" & sourceTitle & "' not found.", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Loop through all content controls to find the target dropdowns
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control is a dropdown with the target title
-        If cc.Type = wdContentControlDropdownList And cc.Title = targetTitle Then
-            ' Clear the existing entries in the target dropdown
-            cc.DropdownListEntries.Clear
-            
-            ' Copy the entries from the source dropdown to the target dropdown
-            For Each item In sourceDropdown.DropdownListEntries
-                cc.DropdownListEntries.Add item.Text
-            Next item
-        End If
-    Next cc
-    
-    ' Show a message confirming that the entries have been copied
-    MsgBox "Dropdown items copied from '" & sourceTitle & "' to all dropdowns with title '" & targetTitle & "'.", vbInformation
-End Sub
+    Dim newValue As String
+    Dim i As Integer
+    Dim found As Boolean
 
-Sub TestCopyDropdownEntries()
-    ' Call the function with the titles of the source and target dropdowns
-    ' Replace "Check1" and "Check2" with your actual dropdown titles in the document
-    Call CopyDropdownEntriesToTargetByTitle("Check1", "Check2")
+    ' Set the new value you want to select in the dropdowns
+    newValue = "NEW" ' Change this as needed
+    found = False
+
+    ' Loop through all ContentControls in the document
+    For Each cc In ActiveDocument.ContentControls
+        ' Check if the ContentControl is a dropdown
+        If cc.Type = wdContentControlDropdownList Then
+            found = True
+
+            ' Loop through all list entries to find the matching value
+            For i = 1 To cc.DropdownListEntries.Count
+                If cc.DropdownListEntries(i).Text = newValue Then
+                    ' Set the dropdown value by index
+                    cc.DropdownListEntries(i).Select
+                    Exit For
+                End If
+            Next i
+        End If
+    Next cc
+
+    ' If no dropdowns are found
+    If Not found Then
+        MsgBox "No dropdowns found!", vbExclamation
+    Else
+        MsgBox "All dropdowns have been updated to: " & newValue, vbInformation
+    End If
 End Sub
