@@ -1,48 +1,38 @@
-Sub ReplaceDropdownByTag()
+Sub ReplaceCheck1WithCheck()
     Dim cc As ContentControl
     Dim newCC As ContentControl
     Dim rng As Range
-    Dim refCC As ContentControl
     Dim foundRef As Boolean
-    Dim i As Integer
 
-    ' Find a reference dropdown with Tag "Check1" (used for copying properties)
-    foundRef = False
-    For Each refCC In ActiveDocument.ContentControls
-        If refCC.Type = wdContentControlDropdown And refCC.Tag = "Check1" Then
-            foundRef = True
-            Exit For
-        End If
-    Next refCC
-
-    ' If no "Check1" dropdown exists, stop and show an error
-    If Not foundRef Then
-        MsgBox "No dropdown with Tag 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
-        Exit Sub
-    End If
-
-    ' Loop backwards to prevent index shifting
-    For i = ActiveDocument.ContentControls.Count To 1 Step -1
-        Set cc = ActiveDocument.ContentControls(i)
-
-        ' If it's a dropdown with Tag "Check"
-        If cc.Type = wdContentControlDropdown And cc.Tag = "Check" Then
-            ' Save its position before deleting
+    ' Loop through all content controls
+    For Each cc In ActiveDocument.ContentControls
+        ' Check if it is a dropdown and has Tag "Check1"
+        If cc.Type = wdContentControlDropdown And cc.Tag = "Check1" Then
+            ' Save the range of the current dropdown
             Set rng = cc.Range
-
-            ' Delete the old dropdown
+            
+            ' Delete the old dropdown (Check1)
             cc.Delete
-
-            ' Insert a new dropdown at the same position
+            
+            ' Add a new dropdown at the same position
             Set newCC = ActiveDocument.ContentControls.Add(wdContentControlDropdown, rng)
-
-            ' Copy properties from "Check1"
-            newCC.Title = refCC.Title
-            newCC.Tag = refCC.Tag
-            newCC.DropdownEntries = refCC.DropdownEntries ' Copy the dropdown list
-
+            
+            ' Set the new dropdown's properties
+            newCC.Title = "Check"    ' Change the title
+            newCC.Tag = "Check"      ' Change the tag
+            
+            ' Optionally, copy the entries from Check1 (if you want the same list)
+            Dim i As Integer
+            For i = 1 To cc.DropdownEntries.Count
+                newCC.DropdownEntries.Add cc.DropdownEntries(i).Text
+            Next i
+            
+            ' Exit the loop after replacing the first matching "Check1" dropdown
+            MsgBox "Dropdown with Tag 'Check1' has been replaced with 'Check'.", vbInformation, "Replacement Complete"
+            Exit Sub
         End If
-    Next i
+    Next cc
 
-    MsgBox "All 'Check' dropdown menus have been replaced with 'Check1'.", vbInformation, "Process Complete"
+    ' If no dropdown with Tag 'Check1' is found
+    MsgBox "No dropdown with Tag 'Check1' found.", vbExclamation, "Error"
 End Sub
