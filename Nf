@@ -1,54 +1,37 @@
-Sub CopySelectedValueFromDropdown()
-    Dim ffSource As FormField
-    Dim ffDestination As FormField
-    Dim patternTitle As String
-    Dim destinationTitle As String
-    Dim selectedItem As String
+Sub SelectSpecificDropdownValue()
+    Dim ff As FormField
+    Dim dropdownTitle As String
+    Dim specificValue As String
     Dim i As Integer
     Dim found As Boolean
 
-    ' Define the titles of the source (pattern) and destination dropdowns
-    patternTitle = "SourceDropdown"     ' Replace with the title of the source dropdown
-    destinationTitle = "DestinationDropdown" ' Replace with the title of the destination dropdown
+    ' Define the title of the dropdown FormField and the value to select
+    dropdownTitle = "YourDropdownTitle"  ' Replace with the title of your dropdown
+    specificValue = "ValueToSelect"      ' Replace with the value you want to select
 
     ' Loop through all FormFields in the document
     For Each ff In ActiveDocument.FormFields
-        ' Check if this is the source (pattern) dropdown (FormField type 4 is a dropdown)
+        ' Check if this is a dropdown (FormField type 4)
         If ff.Type = wdFieldFormDropDown Then
-            ' Check if this is the source (pattern) dropdown
-            If ff.Title = patternTitle Then
-                Set ffSource = ff
-                selectedItem = ffSource.DropDown.SelectedItem ' Get the selected item in the source dropdown
-            End If
-            
-            ' Check if this is the destination dropdown
-            If ff.Title = destinationTitle Then
-                Set ffDestination = ff
+            ' Check if this is the correct dropdown by title
+            If ff.Title = dropdownTitle Then
+                found = False
+                ' Loop through the list entries to find and select the specific value
+                For i = 1 To ff.DropDown.ListEntries.Count
+                    If ff.DropDown.ListEntries(i).Name = specificValue Then
+                        ff.DropDown.ListEntries(i).Select ' Select the item
+                        found = True
+                        Exit For
+                    End If
+                Next i
+                
+                ' If the value is found, inform the user
+                If found Then
+                    MsgBox "Selected the value '" & specificValue & "' successfully."
+                Else
+                    MsgBox "The value '" & specificValue & "' was not found in the dropdown."
+                End If
             End If
         End If
     Next ff
-    
-    ' Ensure both source and destination dropdowns were found
-    If Not ffSource Is Nothing And Not ffDestination Is Nothing Then
-        ' Reset the destination dropdown (remove selection)
-        ffDestination.DropDown.ListEntries(1).Select ' Reset to the first item in the destination dropdown
-
-        ' Loop through the items in the destination dropdown to find the same selected item as the source
-        found = False
-        For i = 1 To ffDestination.DropDown.ListEntries.Count
-            If ffDestination.DropDown.ListEntries(i).Name = selectedItem Then
-                ffDestination.DropDown.ListEntries(i).Select ' Set the same selected item in the destination dropdown
-                found = True
-                Exit For
-            End If
-        Next i
-
-        If found Then
-            MsgBox "Selected value copied successfully."
-        Else
-            MsgBox "The selected item from the source dropdown was not found in the destination dropdown."
-        End If
-    Else
-        MsgBox "Both source and destination dropdowns with specified titles were not found."
-    End If
 End Sub
