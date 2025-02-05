@@ -1,4 +1,4 @@
-Sub ReplaceDropdownCheckWithCheck1()
+Sub ReplaceDropdownByTag()
     Dim cc As ContentControl
     Dim newCC As ContentControl
     Dim rng As Range
@@ -6,10 +6,10 @@ Sub ReplaceDropdownCheckWithCheck1()
     Dim foundRef As Boolean
     Dim i As Integer
 
-    ' Find a reference dropdown with Title "Check1" (used for copying properties)
+    ' Find a reference dropdown with Tag "Check1" (used for copying properties)
     foundRef = False
     For Each refCC In ActiveDocument.ContentControls
-        If refCC.Type = wdContentControlDropdown And refCC.Title = "Check1" Then
+        If refCC.Type = wdContentControlDropdown And refCC.Tag = "Check1" Then
             foundRef = True
             Exit For
         End If
@@ -17,7 +17,7 @@ Sub ReplaceDropdownCheckWithCheck1()
 
     ' If no "Check1" dropdown exists, stop and show an error
     If Not foundRef Then
-        MsgBox "No dropdown with Title 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
+        MsgBox "No dropdown with Tag 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
         Exit Sub
     End If
 
@@ -25,8 +25,8 @@ Sub ReplaceDropdownCheckWithCheck1()
     For i = ActiveDocument.ContentControls.Count To 1 Step -1
         Set cc = ActiveDocument.ContentControls(i)
 
-        ' If it's a dropdown with Title "Check"
-        If cc.Type = wdContentControlDropdown And cc.Title = "Check" Then
+        ' If it's a dropdown with Tag "Check"
+        If cc.Type = wdContentControlDropdown And cc.Tag = "Check" Then
             ' Save its position before deleting
             Set rng = cc.Range
 
