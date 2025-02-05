@@ -1,29 +1,56 @@
-Sub ReplaceDropdownValue()
+Sub ReplaceDropdownControls()
     Dim cc As ContentControl
-    Dim i As Integer
-    Dim entryFound As Boolean
+    Dim newCC As ContentControl
+    Dim refCC As ContentControl
+    Dim rng As Range
+    Dim foundRef As Boolean
     
-    ' Loop through all content controls in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if it's a dropdown list
-        If cc.Type = wdContentControlDropdown Then
-            entryFound = False
+    ' Find a reference dropdown with Title "Check1" (used for replacement)
+    foundRef = False
+    For Each refCC In ActiveDocument.ContentControls
+        If refCC.Type = wdContentControlDropdown And refCC.Title = "Check1" Then
+            foundRef = True
+            Exit For
+        End If
+    Next refCC
+
+    ' If no reference dropdown found, show error
+    If Not foundRef Then
+        MsgBox "No dropdown with title 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
+        Exit Sub
+    End If
+
+    ' Loop backward to avoid indexing issues when deleting controls
+    For i = ActiveDocument.ContentControls.Count To 1 Step -1
+        Set cc = ActiveDocument.ContentControls(i)
+        
+        ' Check if this is a dropdown with title "Check"
+        If cc.Type = wdContentControlDropdown And cc.Title = "Check" Then
+            ' Save the range before deleting
+            Set rng = cc.Range
             
-            ' Loop through all dropdown entries
-            For i = 1 To cc.DropdownListEntries.Count
-                If cc.DropdownListEntries(i).Text = "Check" Then
-                    ' Replace "Check" with "Check1"
-                    cc.DropdownListEntries(i).Text = "Check1"
-                    entryFound = True
-                End If
-            Next i
+            ' Delete the old dropdown
+            cc.Delete
             
-            ' If "Check" was found and replaced, set the new value as the selected value
-            If entryFound Then
-                cc.Range.Text = "Check1" ' Ensure "Check1" is set in the dropdown
+            ' Insert a new dropdown at the same position
+            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlDropdown, rng)
+            
+            ' Copy properties from "Check1" reference dropdown
+            newCC.Title = refCC.Title
+            newCC.Tag = refCC.Tag
+            
+            ' Copy all dropdown entries from reference
+            Dim entry As ContentControlListEntry
+            For Each entry In refCC.DropdownListEntries
+                newCC.DropdownListEntries.Add entry.Text
+            Next entry
+            
+            ' Set the default value
+            If refCC.DropdownListEntries.Count > 0 Then
+                newCC.Range.Text = refCC.DropdownListEntries(1).Text
             End If
         End If
-    Next cc
-
-    MsgBox "All occurrences of 'Check' in dropdowns have been replaced with 'Check1'.", vbInformation, "Update Complete"
+    Next i
+    
+    MsgBox "All 'Check' dropdowns have been replaced with 'Check1'.", vbInformation, "Process Complete"
 End Sub
