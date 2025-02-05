@@ -8,8 +8,17 @@ Sub SetCheckboxStateToChecked()
     ' Check if the content control is a checkbox (type 4)
     If cc.Type = 4 Then ' Type 4 corresponds to a checkbox
 
+      On Error Resume Next ' In case the checkbox doesn't support "Checked" property
+
       ' Set the checkbox to checked (True)
       cc.Checked = True
+
+      If Err.Number <> 0 Then
+        MsgBox "Error while setting checkbox state: " & Err.Description, vbCritical, "Error"
+        Err.Clear ' Clear the error
+      End If
+
+      On Error GoTo 0 ' Reset error handling
 
     End If
 
