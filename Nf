@@ -3,10 +3,9 @@ Sub ReplaceSelectedDropdownItem()
     Dim ccSecond As ContentControl
     Dim patternTitle As String
     Dim destinationTitle As String
-    Dim item As DropdownListEntry
-    Dim i As Integer
     Dim selectedTextSource As String
     Dim selectedTextDest As String
+    Dim i As Integer
     Dim found As Boolean
 
     ' Define the titles of the source (pattern) and destination dropdowns
