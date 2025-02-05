@@ -1,17 +1,15 @@
 Sub ReplaceCheckedContentControlCheckboxes()
     Dim cc As ContentControl
 
-    ' Перебираем все элементы управления содержимым в документе
+    ' Перебираем все элементы управления содержимым
     For Each cc In ActiveDocument.ContentControls
         ' Проверяем, является ли элемент чекбоксом
         If cc.Type = wdContentControlCheckBox Then
-            ' Проверяем, установлен ли чекбокс
+            ' Проверяем, отмечен ли чекбокс
             If cc.Checked Then
-                ' Снимаем отметку
-                cc.Checked = False
-                ' Заменяем на символ ✗
-                cc.Range.Text = "✗"
-                cc.Range.Font.Color = wdColorRed ' Делаем крест красным
+                ' Изменяем символ для отмеченного чекбокса на ✗
+                cc.CheckedSymbol = "✗"
+                cc.Checked = True ' Применяем новый символ
             End If
         End If
     Next cc
