@@ -3,7 +3,7 @@ Sub ReplaceSecondDropdownWithFirst()
     Dim ccSecond As ContentControl
     Dim tagFirst As String
     Dim tagSecond As String
-    Dim item As DropdownListEntry
+    Dim i As Integer
     
     ' Specify the tags or titles you are looking for
     tagFirst = "Dropdown1"  ' Replace with the tag or title of your first dropdown
@@ -28,9 +28,9 @@ Sub ReplaceSecondDropdownWithFirst()
         ccSecond.DropdownListEntries.Clear
         
         ' Add items from the first dropdown to the second
-        For Each item In ccFirst.DropdownListEntries
-            ccSecond.DropdownListEntries.Add item.Text
-        Next item
+        For i = 1 To ccFirst.DropdownListEntries.Count
+            ccSecond.DropdownListEntries.Add ccFirst.DropdownListEntries(i).Text
+        Next i
         
         MsgBox "Dropdown menus replaced successfully."
     Else
