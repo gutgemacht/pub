@@ -2,7 +2,7 @@ Sub ReplaceMultipleDropdowns()
     Dim cc As ContentControl
     Dim ccList As Collection
     Dim i As Integer
-    Dim item As DropdownListEntry
+    Dim item As ContentControlListEntry
     
     ' Create a collection to store dropdowns
     Set ccList = New Collection
@@ -33,7 +33,7 @@ Sub ReplaceMultipleDropdowns()
             
             ' Optionally set the same selected value in the second dropdown
             If ccFirst.DropdownListEntries.Count > 0 Then
-                ccSecond.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)))).Select
+                ccSecond.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)).Select
             End If
         Next i
         
