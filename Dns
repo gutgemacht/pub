@@ -1,31 +1,44 @@
-Sub ReplaceCheck1WithCheck()
+Sub ReplaceCheck1WithCheckComboBox()
     Dim cc As ContentControl
     Dim newCC As ContentControl
     Dim rng As Range
+    Dim i As Integer
 
     ' Loop through all content controls
     For Each cc In ActiveDocument.ContentControls
-        ' Check if it is a dropdown and has Tag "Check1"
-        If cc.Type = wdContentControlDropdown And cc.Tag = "Check1" Then
-            ' Save the range of the current dropdown
+        ' Check if it is a combo box and has Tag "Check1"
+        If cc.Type = wdContentControlComboBox And cc.Tag = "Check1" Then
+            ' Save the range of the current combo box
             Set rng = cc.Range
             
-            ' Delete the old dropdown (Check1)
+            ' Save the entries from the current combo box (if any)
+            Dim oldEntries() As String
+            ReDim oldEntries(cc.DropdownEntries.Count - 1)
+            For i = 1 To cc.DropdownEntries.Count
+                oldEntries(i - 1) = cc.DropdownEntries(i).Text
+            Next i
+            
+            ' Delete the old combo box (Check1)
             cc.Delete
             
-            ' Insert a new content control with the same structure at the same location
-            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlDropdown, rng)
+            ' Insert a new combo box content control at the same position
+            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlComboBox, rng)
             
-            ' Set the new dropdown's properties
+            ' Set the new combo box's properties
             newCC.Title = "Check"    ' Change the title to "Check"
             newCC.Tag = "Check"      ' Change the tag to "Check"
             
-            ' Exit the loop after replacing the first matching "Check1" dropdown
-            MsgBox "Dropdown with Tag 'Check1' has been replaced with 'Check'.", vbInformation, "Replacement Complete"
+            ' Add the saved entries back into the new combo box
+            For i = 0 To UBound(oldEntries)
+                newCC.DropdownEntries.Add oldEntries(i)
+            Next i
+            
+            ' Exit the loop after replacing the first matching "Check1" combo box
+            MsgBox "Combo Box with Tag 'Check1' has been replaced with 'Check'.", vbInformation, "Replacement Complete"
             Exit Sub
         End If
     Next cc
 
-    ' If no dropdown with Tag 'Check1' is found
-    MsgBox "No dropdown with Tag 'Check1' found.", vbExclamation, "Error"
+    ' If no combo box with Tag 'Check1' is found
+    MsgBox "No combo box with Tag 'Check1' found.", vbExclamation, "Error"
 End Sub
