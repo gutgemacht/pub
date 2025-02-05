@@ -1,51 +1,39 @@
-Sub ReplaceMultipleDropdowns()
+Sub CopyDropdownEntriesToAll()
     Dim cc As ContentControl
-    Dim ccList As Collection
-    Dim i As Integer
+    Dim sourceDropdown As ContentControl
+    Dim targetDropdown As ContentControl
     Dim item As ContentControlListEntry
-    Dim ccFirst As ContentControl
-    Dim ccSecond As ContentControl
-    Dim selectedIndex As Integer
     
-    ' Create a collection to store dropdowns
-    Set ccList = New Collection
-
-    ' Loop through all content controls to identify dropdowns
+    ' Find the first dropdown list to use as the source
     For Each cc In ActiveDocument.ContentControls
-        ' Only work with dropdown lists with the title "Check"
-        If cc.Type = wdContentControlDropdownList And cc.Title = "Check" Then
-            ccList.Add cc
+        If cc.Type = wdContentControlDropdownList Then
+            Set sourceDropdown = cc
+            Exit For
         End If
     Next cc
     
-    ' Ensure there are dropdowns to replace
-    If ccList.Count >= 2 Then
-        ' Loop through all dropdowns and copy entries to the next one
-        For i = 1 To ccList.Count - 1
-            ' Get the current dropdown and the next one
-            Set ccFirst = ccList(i)
-            Set ccSecond = ccList(i + 1)
-            
-            ' Clear the second dropdown's items
-            ccSecond.DropdownListEntries.Clear
-            
-            ' Copy items from the first dropdown to the second
-            For Each item In ccFirst.DropdownListEntries
-                ccSecond.DropdownListEntries.Add item.Text
-            Next item
-            
-            ' Optionally set the same selected value in the second dropdown
-            If ccFirst.DropdownListEntries.Count > 0 Then
-                ' Find the selected index in the first dropdown and apply to the second
-                selectedIndex = ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)
-                If selectedIndex >= 1 Then
-                    ccSecond.DropdownListEntries(selectedIndex).Select
-                End If
-            End If
-        Next i
-        
-        MsgBox "Dropdown menus updated successfully."
-    Else
-        MsgBox "No dropdown menus found."
+    ' If no dropdown found, show a message and exit
+    If sourceDropdown Is Nothing Then
+        MsgBox "No dropdown lists found in the document.", vbExclamation
+        Exit Sub
     End If
+    
+    ' Loop through all content controls in the document
+    For Each cc In ActiveDocument.ContentControls
+        ' Check if the content control is a dropdown list
+        If cc.Type = wdContentControlDropdownList Then
+            ' Skip the source dropdown (we don't want to copy into itself)
+            If Not cc.Equals(sourceDropdown) Then
+                ' Clear the target dropdown entries
+                cc.DropdownListEntries.Clear
+                
+                ' Copy items from the source dropdown to the target dropdown
+                For Each item In sourceDropdown.DropdownListEntries
+                    cc.DropdownListEntries.Add item.Text
+                Next item
+            End If
+        End If
+    Next cc
+    
+    MsgBox "Dropdown items copied to all other dropdown lists.", vbInformation
 End Sub
