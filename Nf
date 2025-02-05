@@ -9,14 +9,13 @@ Sub SetCheckBoxToCross45Degrees()
     
     ' Loop through all form fields in the document
     For Each ff In ActiveDocument.FormFields
+        ' Debugging: Show the name and type of each form field
+        MsgBox "Checking FormField: Name = " & ff.Name & ", Type = " & ff.Type
+        
         ' Check if the field is a checkbox (Type 4)
         If ff.Type = wdFieldFormCheckBox Then
-            ' Debugging: Show the Title and Tag of each ContentControl (if any)
-            MsgBox "Checking FormField: Title = " & ff.Name & ", Type = " & ff.Type
-            
-            ' Check if the title or tag matches the checkbox you want
+            ' Check if the name matches the checkbox you want
             If ff.Name = "Check" Then
-                ' Show a message that the checkbox has been found
                 MsgBox "Found checkbox with Name: " & ff.Name
                 
                 ' Set the state to "cross at 45 degrees"
