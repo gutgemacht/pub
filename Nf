@@ -2,24 +2,24 @@ Sub CreateDropdown()
     Dim fld As FormField
     Dim rng As Range
     
-    ' Устанавливаем позицию в документе
+    ' Set the position in the document
     Set rng = Selection.Range
     
-    ' Добавляем выпадающий список (DropDown)
+    ' Add a dropdown list (DropDown)
     Set fld = ActiveDocument.FormFields.Add(rng, wdFieldFormDropDown)
     
-    ' Задаем имя поля (его можно использовать для поиска)
+    ' Set the field name (can be used for finding it later)
     fld.Name = "StatusDropdown"
     
-    ' Добавляем три возможных варианта
+    ' Add three possible options
     With fld.DropDown.ListEntries
-        .Add "✅ Зелёная галочка"
-        .Add "❌ Красный крестик"
-        .Add "🔵 Синий кружочек"
+        .Add "✅ Green Checkmark"
+        .Add "❌ Red Cross"
+        .Add "🔵 Blue Circle"
     End With
     
-    ' Устанавливаем значение по умолчанию (например, пустое)
-    fld.DropDown.Value = "🔵 Синий кружочек"
+    ' Set the default value (e.g., the blue circle)
+    fld.DropDown.Value = "🔵 Blue Circle"
     
-    MsgBox "Выпадающий список создан!", vbInformation
+    MsgBox "Dropdown list created!", vbInformation
 End Sub
