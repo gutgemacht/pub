@@ -1,22 +1,48 @@
-Sub Debug_ListType4Objects()
+Sub ReplaceDropdownCheckWithCheck1()
     Dim cc As ContentControl
-    Dim msg As String
-    Dim xmlData As String
+    Dim newCC As ContentControl
+    Dim rng As Range
+    Dim refCC As ContentControl
+    Dim foundRef As Boolean
+    Dim i As Integer
 
-    msg = "Found the following Type 4 content controls:" & vbCrLf & vbCrLf
-
-    For Each cc In ActiveDocument.ContentControls
-        If cc.Type = 4 Then  ' Type 4 (Supposed to be Checkboxes)
-            xmlData = cc.XML ' Extracts XML data for analysis
-            msg = msg & "Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
-            msg = msg & "Checked: " & cc.Checked & " | Range Text: " & cc.Range.Text & vbCrLf
-            msg = msg & "XML: " & Left(xmlData, 200) & "..." & vbCrLf & vbCrLf  ' Show only first 200 chars of XML
+    ' Find a reference dropdown with Title "Check1" (used for copying properties)
+    foundRef = False
+    For Each refCC In ActiveDocument.ContentControls
+        If refCC.Type = wdContentControlDropdown And refCC.Title = "Check1" Then
+            foundRef = True
+            Exit For
         End If
-    Next cc
+    Next refCC
 
-    If msg = "Found the following Type 4 content controls:" & vbCrLf & vbCrLf Then
-        MsgBox "No Type 4 content controls found!", vbExclamation, "Debug Info"
-    Else
-        MsgBox msg, vbInformation, "Type 4 Content Controls"
+    ' If no "Check1" dropdown exists, stop and show an error
+    If Not foundRef Then
+        MsgBox "No dropdown with Title 'Check1' found. Cannot replace 'Check'.", vbCritical, "Error"
+        Exit Sub
     End If
+
+    ' Loop backwards to prevent index shifting
+    For i = ActiveDocument.ContentControls.Count To 1 Step -1
+        Set cc = ActiveDocument.ContentControls(i)
+
+        ' If it's a dropdown with Title "Check"
+        If cc.Type = wdContentControlDropdown And cc.Title = "Check" Then
+            ' Save its position before deleting
+            Set rng = cc.Range
+
+            ' Delete the old dropdown
+            cc.Delete
+
+            ' Insert a new dropdown at the same position
+            Set newCC = ActiveDocument.ContentControls.Add(wdContentControlDropdown, rng)
+
+            ' Copy properties from "Check1"
+            newCC.Title = refCC.Title
+            newCC.Tag = refCC.Tag
+            newCC.DropdownEntries = refCC.DropdownEntries ' Copy the dropdown list
+
+        End If
+    Next i
+
+    MsgBox "All 'Check' dropdown menus have been replaced with 'Check1'.", vbInformation, "Process Complete"
 End Sub
