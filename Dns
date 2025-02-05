@@ -1,6 +1,8 @@
-Sub SetHourglassSymbol()
+Sub ShowCheckboxSettings()
 
   Dim cc As ContentControl
+  Dim checkboxDetails As String
+  checkboxDetails = ""
 
   ' Loop through each content control in the document
   For Each cc In ActiveDocument.ContentControls
@@ -8,19 +10,23 @@ Sub SetHourglassSymbol()
     ' Check if the content control is a checkbox (type 4)
     If cc.Type = 4 Then ' Type 4 corresponds to a checkbox
 
-      ' Check if the checkbox is checked
-      If cc.Checked = True Then
-        ' Set the content control text to the hourglass symbol (⏳)
-        cc.Range.Text = "⏳"
-      Else
-        ' Set the content control text to an empty string or any other default
-        cc.Range.Text = ""
-      End If
+      ' Collect the checkbox properties
+      checkboxDetails = checkboxDetails & "Checkbox Title: " & cc.Title & vbCrLf
+      checkboxDetails = checkboxDetails & "Checkbox Tag: " & cc.Tag & vbCrLf
+      checkboxDetails = checkboxDetails & "Checked: " & IIf(cc.Checked, "Yes", "No") & vbCrLf
+      checkboxDetails = checkboxDetails & "Locked: " & IIf(cc.Locked, "Yes", "No") & vbCrLf
+      checkboxDetails = checkboxDetails & "Value: " & cc.Value & vbCrLf
+      checkboxDetails = checkboxDetails & "----------------------------------------" & vbCrLf
 
     End If
 
   Next cc
 
-  MsgBox "Hourglasses set for checked checkboxes.", vbInformation, "Hourglass Symbols Updated"
+  ' Display the collected checkbox details in a message box
+  If Len(checkboxDetails) > 0 Then
+    MsgBox checkboxDetails, vbInformation, "Checkbox Settings"
+  Else
+    MsgBox "No checkboxes found in the document.", vbInformation, "No Checkboxes"
+  End If
 
 End Sub
