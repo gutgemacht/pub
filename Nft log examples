@@ -1,19 +1,20 @@
 Private Sub CheckBox1_Click()
     Static currentState As Integer
     
-    ' Only cycle the state when the checkbox is clicked
+    ' Cycle through the three states
     currentState = (currentState + 1) Mod 3
     
-    ' Change the color based on the state
+    ' Get the rectangle shape (change "Rectangle 1" to the name of your shape)
+    Dim rect As Shape
+    Set rect = ActiveDocument.Shapes("Rectangle 1")
+    
+    ' Update the rectangle color based on the state
     Select Case currentState
-        Case 0 ' Checked (Green Check)
-            CheckBox1.Caption = "✓"
-            CheckBox1.ForeColor = RGB(0, 255, 0) ' Green
-        Case 1 ' Indeterminate (Yellow Sandglass)
-            CheckBox1.Caption = "⏳"
-            CheckBox1.ForeColor = RGB(255, 255, 0) ' Yellow
-        Case 2 ' Unchecked (Red Cross)
-            CheckBox1.Caption = "✗"
-            CheckBox1.ForeColor = RGB(255, 0, 0) ' Red
+        Case 0 ' Green
+            rect.Fill.ForeColor.RGB = RGB(0, 255, 0) ' Green
+        Case 1 ' Yellow
+            rect.Fill.ForeColor.RGB = RGB(255, 255, 0) ' Yellow
+        Case 2 ' Red
+            rect.Fill.ForeColor.RGB = RGB(255, 0, 0) ' Red
     End Select
 End Sub
