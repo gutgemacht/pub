@@ -1,24 +1,35 @@
-Sub CheckContentControls()
-    Dim cc As ContentControl
+Sub SetCheckBoxToCross45Degrees()
+    Dim ff As FormField
+    Dim newState As Long
     Dim foundCheckbox As Boolean
     
+    ' Set the state to the desired one (cross at 45 degrees)
+    newState = 2 ' Adjust this to the correct state value for cross at 45 degrees
     foundCheckbox = False ' Initialize the flag to check if any checkboxes are found
     
-    ' Loop through all ContentControl objects in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Display the type and title/tag of each ContentControl
-        MsgBox "ContentControl found! Type: " & cc.Type & ", Title: " & cc.Title & ", Tag: " & cc.Tag
-        
-        ' Check if the title or tag matches the checkbox you want
-        If cc.Type = wdContentControlCheckBox Then
-            If cc.Title = "Check" Or cc.Tag = "Check" Then
-                MsgBox "Found checkbox with Title: " & cc.Title & " and Tag: " & cc.Tag
+    ' Loop through all form fields in the document
+    For Each ff In ActiveDocument.FormFields
+        ' Check if the field is a checkbox (Type 4)
+        If ff.Type = wdFieldFormCheckBox Then
+            ' Debugging: Show the Title and Tag of each ContentControl (if any)
+            MsgBox "Checking FormField: Title = " & ff.Name & ", Type = " & ff.Type
+            
+            ' Check if the title or tag matches the checkbox you want
+            If ff.Name = "Check" Then
+                ' Show a message that the checkbox has been found
+                MsgBox "Found checkbox with Name: " & ff.Name
+                
+                ' Set the state to "cross at 45 degrees"
+                ff.CheckBox.Value = newState
+                MsgBox "Changed checkbox to desired state (cross at 45 degrees)."
+                
                 foundCheckbox = True
             End If
         End If
-    Next cc
+    Next ff
     
+    ' If no checkbox was found, show a message
     If Not foundCheckbox Then
-        MsgBox "No checkboxes with Title or Tag 'Check' found."
+        MsgBox "No checkboxes with Name 'Check' found."
     End If
 End Sub
