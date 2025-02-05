@@ -1,21 +1,19 @@
-Private Sub CheckBox1_Click()
-    Static currentState As Integer
+Sub ChangeCheckboxToEmpty()
+    Dim cc As ContentControl
+    Dim ccText As String
     
-    ' Перебираем состояния: 0 = Completed, 1 = Incompleted, 2 = Error, 3 = Pending
-    currentState = (currentState + 1) Mod 4
-    
-    Select Case currentState
-        Case 0 ' Completed
-            CheckBox1.Caption = "✔ Completed"
-            CheckBox1.ForeColor = RGB(0, 255, 0) ' Зеленый цвет
-        Case 1 ' Incompleted
-            CheckBox1.Caption = "✘ Incompleted"
-            CheckBox1.ForeColor = RGB(255, 0, 0) ' Красный цвет
-        Case 2 ' Error
-            CheckBox1.Caption = "❌ Error"
-            CheckBox1.ForeColor = RGB(255, 165, 0) ' Оранжевый цвет
-        Case 3 ' Pending
-            CheckBox1.Caption = "⏳ Pending"
-            CheckBox1.ForeColor = RGB(255, 255, 0) ' Желтый цвет
-    End Select
+    ' Loop through all content controls in the document
+    For Each cc In ActiveDocument.ContentControls
+        ' Check if the content control is a checkbox
+        If cc.Type = wdContentControlCheckBox Then
+            ' Get the current text of the checkbox (tick, cross, or empty)
+            ccText = cc.Range.Text
+            
+            ' Change the text to empty state (☐) if it is checked or has a cross
+            If ccText = "✔" Or ccText = "✗" Then
+                ' Set checkbox to empty state (☐)
+                cc.Range.Text = "☐"
+            End If
+        End If
+    Next cc
 End Sub
