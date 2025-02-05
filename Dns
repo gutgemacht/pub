@@ -32,6 +32,9 @@ Sub ReplaceSecondDropdownWithFirst()
             ccSecond.DropdownListEntries.Add ccFirst.DropdownListEntries(i).Text
         Next i
         
+        ' Ensure the second dropdown reflects the changes
+        ccSecond.DropdownListEntries(1).Select  ' Set a default selected entry if needed
+        
         MsgBox "Dropdown menus replaced successfully."
     Else
         MsgBox "Both dropdown menus with specified tags or titles were not found."
