@@ -2,7 +2,6 @@ Sub ReplaceCheck1WithCheck()
     Dim cc As ContentControl
     Dim newCC As ContentControl
     Dim rng As Range
-    Dim foundRef As Boolean
 
     ' Loop through all content controls
     For Each cc In ActiveDocument.ContentControls
@@ -14,22 +13,13 @@ Sub ReplaceCheck1WithCheck()
             ' Delete the old dropdown (Check1)
             cc.Delete
             
-            ' Add a new dropdown at the same position
+            ' Insert a new content control with the same structure at the same location
             Set newCC = ActiveDocument.ContentControls.Add(wdContentControlDropdown, rng)
             
             ' Set the new dropdown's properties
             newCC.Title = "Check"    ' Change the title to "Check"
             newCC.Tag = "Check"      ' Change the tag to "Check"
             
-            ' Optionally, copy the entries from Check1 if you want the same list
-            On Error Resume Next
-            If cc.DropdownEntries.Count > 0 Then
-                For i = 1 To cc.DropdownEntries.Count
-                    newCC.DropdownEntries.Add cc.DropdownEntries(i).Text
-                Next i
-            End If
-            On Error GoTo 0
-
             ' Exit the loop after replacing the first matching "Check1" dropdown
             MsgBox "Dropdown with Tag 'Check1' has been replaced with 'Check'.", vbInformation, "Replacement Complete"
             Exit Sub
