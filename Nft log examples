@@ -1,18 +1,26 @@
-Sub UncheckAllCheckboxes()
-    Dim chk As ContentControl
-    Dim f As FormField
+Sub RemoveAllChecks()
+    Dim shp As InlineShape
+    Dim r As Range
 
-    ' Для современных чекбоксов (Content Controls)
+    ' Снять галочки из ActiveX и Content Controls
+    Dim chk As ContentControl
     For Each chk In ActiveDocument.ContentControls
         If chk.Type = wdContentControlCheckBox Then
             chk.Checked = False
         End If
     Next chk
 
-    ' Для устаревших чекбоксов (Form Fields)
+    ' Снять галочки из старых форм (Form Fields)
+    Dim f As FormField
     For Each f In ActiveDocument.FormFields
         If f.Type = wdFieldFormCheckBox Then
             f.CheckBox.Value = False
         End If
     Next f
+
+    ' Удалить символы галочек (если они вставлены вручную)
+    For Each r In ActiveDocument.StoryRanges
+        r.Find.Execute FindText:="☑", ReplaceWith:="□", Replace:=wdReplaceAll
+        r.Find.Execute FindText:="■", ReplaceWith:="□", Replace:=wdReplaceAll
+    Next r
 End Sub
