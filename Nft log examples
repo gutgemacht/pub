@@ -10,6 +10,9 @@ Sub SetCheckBoxToCross45Degrees()
     ' Loop through all ContentControl objects in the document
     For Each cc In ActiveDocument.ContentControls
         If cc.Type = wdContentControlCheckBox Then
+            ' Debugging: Show the Title and Tag of each ContentControl
+            MsgBox "Checking ContentControl: Title = " & cc.Title & ", Tag = " & cc.Tag
+            
             ' Check if the title or tag matches the checkbox you want
             If cc.Title = "Check" Or cc.Tag = "Check" Then
                 ' Show a message that the checkbox has been found
