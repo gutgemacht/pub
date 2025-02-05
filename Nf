@@ -40,4 +40,15 @@ Sub ReplaceMultipleDropdownsWithTitles()
                             ccSecond.DropdownListEntries.Add item.Text
                         Next item
                         
-                        ' Optionally select the first
+                        ' Optionally select the first item in the destination dropdown
+                        ccSecond.DropdownListEntries(1).Select
+                    End If
+                Next ccSecond
+            End If
+        Next i
+        
+        MsgBox "Dropdown menus replaced successfully."
+    Else
+        MsgBox "There are not enough dropdowns to replace."
+    End If
+End Sub
