@@ -4,34 +4,38 @@ Sub CopyDropdownEntriesToTargetByTitle(sourceTitle As String, targetTitle As Str
     Dim targetDropdown As ContentControl
     Dim item As ContentControlListEntry
     
-    ' Find the source dropdown by title
+    ' Initialize the sourceDropdown to Nothing
     Set sourceDropdown = Nothing
+    
+    ' Find the source dropdown by title
     For Each cc In ActiveDocument.ContentControls
+        ' Check if the content control is a dropdown and has the correct title
         If cc.Type = wdContentControlDropdownList And cc.Title = sourceTitle Then
             Set sourceDropdown = cc
-            Exit For
+            Exit For ' Exit once the source dropdown is found
         End If
     Next cc
     
-    ' If no source dropdown found, show a message and exit
+    ' If no source dropdown is found, show a message and exit the macro
     If sourceDropdown Is Nothing Then
         MsgBox "Source dropdown with title '" & sourceTitle & "' not found.", vbExclamation
         Exit Sub
     End If
     
-    ' Loop through all content controls in the document
+    ' Loop through all content controls to find the target dropdowns
     For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control is a dropdown list with the target title
+        ' Check if the content control is a dropdown with the target title
         If cc.Type = wdContentControlDropdownList And cc.Title = targetTitle Then
-            ' Clear the target dropdown entries
+            ' Clear the existing entries in the target dropdown
             cc.DropdownListEntries.Clear
             
-            ' Copy items from the source dropdown to the target dropdown
+            ' Copy the entries from the source dropdown to the target dropdown
             For Each item In sourceDropdown.DropdownListEntries
                 cc.DropdownListEntries.Add item.Text
             Next item
         End If
     Next cc
     
+    ' Show a message confirming that the entries have been copied
     MsgBox "Dropdown items copied from '" & sourceTitle & "' to all dropdowns with title '" & targetTitle & "'.", vbInformation
 End Sub
