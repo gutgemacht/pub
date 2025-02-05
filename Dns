@@ -3,20 +3,23 @@ Sub ReplaceMultipleDropdowns()
     Dim ccList As Collection
     Dim i As Integer
     Dim item As ContentControlListEntry
+    Dim ccFirst As ContentControl
+    Dim ccSecond As ContentControl
+    Dim selectedIndex As Integer
     
     ' Create a collection to store dropdowns
     Set ccList = New Collection
 
     ' Loop through all content controls to identify dropdowns
     For Each cc In ActiveDocument.ContentControls
-        ' Only work with dropdown lists
-        If cc.Type = wdContentControlDropdownList Then
+        ' Only work with dropdown lists with the title "Check"
+        If cc.Type = wdContentControlDropdownList And cc.Title = "Check" Then
             ccList.Add cc
         End If
     Next cc
     
     ' Ensure there are dropdowns to replace
-    If ccList.Count >= 1 Then
+    If ccList.Count >= 2 Then
         ' Loop through all dropdowns and copy entries to the next one
         For i = 1 To ccList.Count - 1
             ' Get the current dropdown and the next one
@@ -33,7 +36,11 @@ Sub ReplaceMultipleDropdowns()
             
             ' Optionally set the same selected value in the second dropdown
             If ccFirst.DropdownListEntries.Count > 0 Then
-                ccSecond.DropdownListEntries(ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)).Select
+                ' Find the selected index in the first dropdown and apply to the second
+                selectedIndex = ccFirst.DropdownListEntries.IndexOf(ccFirst.SelectedItem)
+                If selectedIndex >= 1 Then
+                    ccSecond.DropdownListEntries(selectedIndex).Select
+                End If
             End If
         Next i
         
