@@ -1,27 +1,17 @@
-Sub ChangeAllCheckBoxes()
+Sub SetCheckBoxToCross45Degrees()
     Dim cc As ContentControl
     Dim newState As Long
     
-    ' Set the state you want to select
-    ' 1 = Checked
-    ' 2 = Unchecked
-    ' 3 = Not defined
-    newState = 1 ' Change to the desired state
+    ' Set the state to the desired one (cross at 45 degrees)
+    newState = 2 ' You may need to adjust this based on the exact value for "cross at 45 degrees"
     
     ' Loop through all ContentControl objects in the document
     For Each cc In ActiveDocument.ContentControls
         If cc.Type = wdContentControlCheckBox Then
-            ' Check if the title or tag matches
+            ' Check if the title or tag matches the checkbox you want
             If cc.Title = "Check" Or cc.Tag = "Check" Then
-                ' Change the state based on newState
-                Select Case newState
-                    Case 1 ' Checked
-                        cc.Range.FormFields(1).CheckBox.Value = True
-                    Case 2 ' Unchecked
-                        cc.Range.FormFields(1).CheckBox.Value = False
-                    Case 3 ' Not defined (if needed, use default or leave empty)
-                        cc.Range.FormFields(1).CheckBox.Value = wdUndefined
-                End Select
+                ' Set the state to "cross at 45 degrees"
+                cc.Range.FormFields(1).CheckBox.Value = newState
             End If
         End If
     Next cc
