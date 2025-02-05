@@ -1,54 +1,42 @@
-Sub ReplaceMultipleDropdownsWithTitles()
-    Dim ccList As Collection
+Sub ReplaceSelectedDropdownItem()
     Dim ccFirst As ContentControl
     Dim ccSecond As ContentControl
     Dim patternTitle As String
     Dim destinationTitle As String
+    Dim item As DropdownListEntry
     Dim i As Integer
+    Dim selectedIndexSource As Integer
+    Dim selectedIndexDest As Integer
 
-    ' Define the pattern title (source) and destination title
+    ' Define the titles of the source (pattern) and destination dropdowns
     patternTitle = "SourceDropdown"     ' Replace with the title of the source dropdown
     destinationTitle = "DestinationDropdown" ' Replace with the title of the destination dropdown
 
-    ' Create a collection to store dropdowns
-    Set ccList = New Collection
-
-    ' Loop through all content controls to identify dropdowns
+    ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
-        ' Only work with dropdown lists
+        ' Ensure the content control is a dropdown list and matches the pattern title
         If cc.Type = wdContentControlDropdownList Then
-            ccList.Add cc
+            ' Check if this is the source (pattern) dropdown
+            If cc.Title = patternTitle Then
+                Set ccFirst = cc
+                selectedIndexSource = ccFirst.DropdownListEntries(ccFirst.DropdownListEntries.Count).Index ' Default selection index
+            End If
+            
+            ' Check if this is the destination dropdown
+            If cc.Title = destinationTitle Then
+                Set ccSecond = cc
+                selectedIndexDest = ccSecond.DropdownListEntries(ccSecond.DropdownListEntries.Count).Index ' Default selection index
+            End If
         End If
     Next cc
     
-    ' Ensure at least two dropdowns exist in the document
-    If ccList.Count >= 2 Then
-        ' Loop through the collection and replace the dropdowns with matching titles
-        For i = 1 To ccList.Count
-            Set ccFirst = ccList(i)
-            
-            ' Check if the current content control is the pattern (source)
-            If ccFirst.Title = patternTitle Then
-                For Each ccSecond In ccList
-                    ' Check if the content control is the destination
-                    If ccSecond.Title = destinationTitle Then
-                        ' Clear the destination dropdown's items
-                        ccSecond.DropdownListEntries.Clear
-                        
-                        ' Copy items from the pattern (source) dropdown to the destination dropdown
-                        For Each item In ccFirst.DropdownListEntries
-                            ccSecond.DropdownListEntries.Add item.Text
-                        Next item
-                        
-                        ' Optionally select the first item in the destination dropdown
-                        ccSecond.DropdownListEntries(1).Select
-                    End If
-                Next ccSecond
-            End If
-        Next i
+    ' Ensure both source and destination dropdowns were found
+    If Not ccFirst Is Nothing And Not ccSecond Is Nothing Then
+        ' Reset the selected item in the destination dropdown to the source dropdown's selection
+        ccSecond.DropdownListEntries(selectedIndexSource).Select
         
-        MsgBox "Dropdown menus replaced successfully."
+        MsgBox "Default selected item in destination dropdown reset successfully."
     Else
-        MsgBox "There are not enough dropdowns to replace."
+        MsgBox "Both source and destination dropdowns with specified titles were not found."
     End If
 End Sub
