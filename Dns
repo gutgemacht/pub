@@ -41,7 +41,7 @@ Sub CopyDropdownEntriesToTargetByTitle(sourceTitle As String, targetTitle As Str
 End Sub
 
 Sub TestCopyDropdownEntries()
-    ' This is where you specify the titles of the source and target dropdowns.
-    ' Replace with your dropdown titles.
-    Call CopyDropdownEntriesToTargetByTitle("SourceDropdown", "TargetDropdown")
+    ' Call the function with the titles of the source and target dropdowns
+    ' Replace "Check1" and "Check2" with your actual dropdown titles in the document
+    Call CopyDropdownEntriesToTargetByTitle("Check1", "Check2")
 End Sub
