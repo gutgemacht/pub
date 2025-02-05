@@ -1,20 +1,20 @@
 Sub SelectSpecificDropdownValue()
     Dim ff As FormField
-    Dim dropdownTitle As String
+    Dim dropdownName As String
     Dim specificValue As String
     Dim i As Integer
     Dim found As Boolean
 
-    ' Define the title of the dropdown FormField and the value to select
-    dropdownTitle = "YourDropdownTitle"  ' Replace with the title of your dropdown
-    specificValue = "ValueToSelect"      ' Replace with the value you want to select
+    ' Define the name of the dropdown FormField and the value to select
+    dropdownName = "YourDropdownName"  ' Replace with the name of your dropdown
+    specificValue = "ValueToSelect"    ' Replace with the value you want to select
 
     ' Loop through all FormFields in the document
     For Each ff In ActiveDocument.FormFields
         ' Check if this is a dropdown (FormField type 4)
         If ff.Type = wdFieldFormDropDown Then
-            ' Check if this is the correct dropdown by title
-            If ff.Title = dropdownTitle Then
+            ' Check if this is the correct dropdown by name
+            If ff.Name = dropdownName Then
                 found = False
                 ' Loop through the list entries to find and select the specific value
                 For i = 1 To ff.DropDown.ListEntries.Count
