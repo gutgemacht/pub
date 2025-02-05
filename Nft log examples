@@ -1,12 +1,16 @@
-Sub ChangeCheckboxToEmpty()
+Sub CreateCheckbox()
     Dim cc As ContentControl
     
-    ' Loop through all content controls in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if the content control is a checkbox
-        If cc.Type = wdContentControlCheckBox Then
-            ' If the checkbox is checked or unchecked, set it to unchecked (empty)
-            cc.Checked = False
-        End If
-    Next cc
+    ' Create a new ContentControl checkbox
+    Set cc = ActiveDocument.ContentControls.Add(wdContentControlCheckBox)
+    
+    ' Set the initial state of the checkbox (unchecked)
+    cc.Checked = False  ' Initial state (unchecked)
+    
+    ' Set Title or Tag (optional)
+    cc.Title = "MyCheckbox"
+    cc.Tag = "CheckboxTag"
+    
+    ' Add description or text (optional)
+    cc.Range.Text = "☐ My checkbox"
 End Sub
