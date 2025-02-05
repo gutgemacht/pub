@@ -1,21 +1,27 @@
-Sub CreateComboBox()
-    Dim cb As ContentControl
+Sub ChangeDropdownValue()
+    Dim cc As ContentControl
+    Dim newValue As String
+    Dim found As Boolean
     
-    ' Insert a ComboBox Content Control at the cursor position
-    Set cb = ActiveDocument.ContentControls.Add(wdContentControlDropdownList)
+    ' New value to select (change to "❌ Red Cross" or "🔵 Blue Circle")
+    newValue = "✅ Green Checkmark"  ' Change this as needed
     
-    ' Set the title (name) of the dropdown
-    cb.Title = "StatusDropdown"
+    found = False
     
-    ' Add three options to the dropdown
-    With cb.DropdownListEntries
-        .Add "✅ Green Checkmark"
-        .Add "❌ Red Cross"
-        .Add "🔵 Blue Circle"
-    End With
+    ' Loop through all ContentControls in the document
+    For Each cc In ActiveDocument.ContentControls
+        ' Check if it's the correct dropdown by title
+        If cc.Title = "StatusDropdown" Then
+            found = True
+            ' Change the selected value
+            cc.DropdownListEntries.SelectByText newValue
+            MsgBox "Selected value changed to: " & newValue, vbInformation
+            Exit Sub
+        End If
+    Next cc
     
-    ' Set the default value (e.g., blue circle)
-    cb.DropdownListEntries(3).Select
-    
-    MsgBox "Dropdown list created!", vbInformation
+    ' If the dropdown is not found
+    If Not found Then
+        MsgBox "Dropdown not found!", vbExclamation
+    End If
 End Sub
