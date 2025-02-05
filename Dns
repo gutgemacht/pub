@@ -1,26 +1,29 @@
-Sub ListDropdownValues()
+Sub ReplaceDropdownValue()
     Dim cc As ContentControl
     Dim i As Integer
-    Dim output As String
+    Dim entryFound As Boolean
     
     ' Loop through all content controls in the document
     For Each cc In ActiveDocument.ContentControls
         ' Check if it's a dropdown list
         If cc.Type = wdContentControlDropdown Then
-            output = "Dropdown Title: " & cc.Title & " | Tag: " & cc.Tag & vbCrLf
-            output = output & "Available Entries:" & vbCrLf
+            entryFound = False
             
             ' Loop through all dropdown entries
             For i = 1 To cc.DropdownListEntries.Count
-                output = output & "  " & i & ". " & cc.DropdownListEntries(i).Text & vbCrLf
+                If cc.DropdownListEntries(i).Text = "Check" Then
+                    ' Replace "Check" with "Check1"
+                    cc.DropdownListEntries(i).Text = "Check1"
+                    entryFound = True
+                End If
             Next i
             
-            output = output & String(40, "-") ' Separator for clarity
-            
-            ' Print to Immediate Window (Ctrl + G to view)
-            Debug.Print output
+            ' If "Check" was found and replaced, set the new value as the selected value
+            If entryFound Then
+                cc.Range.Text = "Check1" ' Ensure "Check1" is set in the dropdown
+            End If
         End If
     Next cc
-    
-    MsgBox "Dropdown list details have been printed to the Immediate Window.", vbInformation, "Process Complete"
+
+    MsgBox "All occurrences of 'Check' in dropdowns have been replaced with 'Check1'.", vbInformation, "Update Complete"
 End Sub
