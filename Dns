@@ -1,34 +1,24 @@
-Sub ChangeAllDropdowns()
-    Dim cc As ContentControl
-    Dim newValue As String
-    Dim i As Integer
-    Dim found As Boolean
+---
+- name: Create a self-signed certificate on Windows
+  hosts: windows
+  gather_facts: no
+  tasks:
 
-    ' Set the new value you want to select in the dropdowns
-    newValue = "NEW" ' Change this as needed
-    found = False
+    - name: Generate self-signed certificate
+      win_shell: |
+        $cert = New-SelfSignedCertificate -DnsName "your.domain.com" -CertStoreLocation "Cert:\LocalMachine\My"
+        $pwd = ConvertTo-SecureString -String "P@ssw0rd!" -Force -AsPlainText
+        Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "C:\Certificates\your_cert.pfx" -Password $pwd
+      args:
+        executable: powershell
 
-    ' Loop through all ContentControls in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if the ContentControl is a dropdown
-        If cc.Type = wdContentControlDropdownList Then
-            found = True
+    - name: Ensure certificate directory exists
+      win_file:
+        path: C:\Certificates
+        state: directory
 
-            ' Loop through all list entries to find the matching value
-            For i = 1 To cc.DropdownListEntries.Count
-                If cc.DropdownListEntries(i).Text = newValue Then
-                    ' Set the dropdown value by index
-                    cc.DropdownListEntries(i).Select
-                    Exit For
-                End If
-            Next i
-        End If
-    Next cc
-
-    ' If no dropdowns are found
-    If Not found Then
-        MsgBox "No dropdowns found!", vbExclamation
-    Else
-        MsgBox "All dropdowns have been updated to: " & newValue, vbInformation
-    End If
-End Sub
+    - name: Fetch certificate from Windows to Ansible control node
+      fetch:
+        src: C:\Certificates\your_cert.pfx
+        dest: ./your_cert.pfx
+        flat: yes
