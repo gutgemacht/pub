@@ -1,34 +1,8 @@
-Sub ChangeDropdownValue()
-    Dim cc As ContentControl
-    Dim newValue As String
-    Dim i As Integer
-    Dim found As Boolean
-    
-    ' New value to select (change to "❌ Red Cross" or "🔵 Blue Circle")
-    newValue = "✅ Green Checkmark"  ' Change this as needed
-    
-    found = False
-    
-    ' Loop through all ContentControls in the document
-    For Each cc In ActiveDocument.ContentControls
-        ' Check if it's the correct dropdown by title
-        If cc.Title = "StatusDropdown" Then
-            found = True
-            
-            ' Loop through all list entries to find the matching value
-            For i = 1 To cc.DropdownListEntries.Count
-                If cc.DropdownListEntries(i).Text = newValue Then
-                    ' Set the selected value by index
-                    cc.DropdownListEntries(i).Select
-                    MsgBox "Selected value changed to: " & newValue, vbInformation
-                    Exit Sub
-                End If
-            Next i
-        End If
-    Next cc
-    
-    ' If the dropdown is not found
-    If Not found Then
-        MsgBox "Dropdown not found!", vbExclamation
-    End If
-End Sub
+---
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
+  when: action == "install"
+
+- name: Include deinstallation tasks
+  ansible.builtin.include_tasks: deinstall.yml
+  when: action == "deinstall" 
