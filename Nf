@@ -6,3 +6,19 @@
 - name: Include deinstallation tasks
   ansible.builtin.include_tasks: deinstall.yml
   when: action == "deinstall" 
+
+
+
+
+
+
+---
+- name: Manage SSL Certificates
+  hosts: all
+  become: yes
+
+  vars:
+    action: install  # Change to "deinstall" to remove certificates
+
+  roles:
+    - manage_certificate 
