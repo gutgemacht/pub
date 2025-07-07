@@ -1,1 +1,11 @@
+set_variable_from_filename() {
+    local filename="$1"
 
+    if [[ "$filename" =~ ^(sap[0-9]+)[0-9]{14}\.csv$ ]]; then
+        local prefix="${BASH_REMATCH[1]}"
+        declare -g "${prefix}"="$filename"
+    else
+        echo "Invalid filename format"
+        return 1
+    fi
+}
