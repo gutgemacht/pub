@@ -9,3 +9,18 @@ set_variable_from_filename() {
         return 1
     fi
 }
+
+
+
+set_variable_from_filename() {
+    local filename="$1"
+
+    # Extract prefix: everything before the first digit sequence of 14 numbers
+    if [[ "$filename" =~ ^([a-zA-Z0-9_-]+)[0-9]{14}\.csv$ ]]; then
+        local prefix="${BASH_REMATCH[1]}"
+        declare -g "${prefix}"="$filename"
+    else
+        echo "Invalid filename format: $filename"
+        return 1
+    fi
+}
