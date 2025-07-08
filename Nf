@@ -1,24 +1,9 @@
----
-- name: Include installation tasks
-  ansible.builtin.include_tasks: install.yml
-  when: action == "install"
-
-- name: Include deinstallation tasks
-  ansible.builtin.include_tasks: deinstall.yml
-  when: action == "deinstall" 
-
-
-
-
-
-
----
-- name: Manage SSL Certificates
-  hosts: all
-  become: yes
-
-  vars:
-    action: install  # Change to "deinstall" to remove certificates
-
-  roles:
-    - manage_certificate 
+#!/bin/bash
+# ============================================
+# Script Name : backup.sh
+# Description : This script creates a backup.
+# Author      : John Doe
+# Date        : 2025-07-08
+# Version     : 1.0
+# Usage       : ./backup.sh [options]
+# ============================================
