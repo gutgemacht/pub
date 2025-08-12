@@ -1,9 +1,20 @@
-#!/bin/bash
-# ============================================
-# Script Name : backup.sh
-# Description : This script creates a backup.
-# Author      : John Doe
-# Date        : 2025-07-08
-# Version     : 1.0
-# Usage       : ./backup.sh [options]
-# ============================================
+/* Make Jira Kanban cards more compact without changing font size */
+.ghx-issue {
+    padding: 4px 6px !important;
+    margin: 2px 0 !important;
+    min-height: unset !important;
+}
+
+.ghx-issue-content {
+    padding: 2px !important;
+}
+
+.ghx-summary {
+    line-height: 1.2 !important;
+}
+
+.ghx-extra-fields,
+.ghx-flags,
+.ghx-avatar {
+    margin-top: 2px !important;
+}
