@@ -1,4 +1,4 @@
-/* Компактные карточки Jira Kanban */
+/* Kompakte Jira-Karten */
 .ghx-issue {
     padding: 4px 6px !important;
     margin: 2px 0 !important;
@@ -14,16 +14,16 @@
     line-height: 1.2 !important;
 }
 
-/* Оставляем значок исполнителя, скрываем имя */
+/* Icon bleibt, Name wird versteckt */
 .ghx-avatar .ghx-avatar-img {
     display: inline-block !important;
 }
 
-.ghx-avatar .ghx-display-name {
+span.GHX-Extra-Field-Content {
     display: none !important;
 }
 
-/* Немного уменьшаем отступы у дополнительных элементов */
+/* Kleine Abstände bei Zusatzinfos */
 .ghx-extra-fields,
 .ghx-flags {
     margin-top: 2px !important;
