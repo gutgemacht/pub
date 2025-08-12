@@ -1,8 +1,9 @@
-/* Make Jira Kanban cards more compact without changing font size */
+/* Компактные карточки Jira Kanban */
 .ghx-issue {
     padding: 4px 6px !important;
     margin: 2px 0 !important;
-    min-height: unset !important;
+    min-height: 30px !important;
+    height: auto !important;
 }
 
 .ghx-issue-content {
@@ -13,8 +14,17 @@
     line-height: 1.2 !important;
 }
 
+/* Оставляем значок исполнителя, скрываем имя */
+.ghx-avatar .ghx-avatar-img {
+    display: inline-block !important;
+}
+
+.ghx-avatar .ghx-display-name {
+    display: none !important;
+}
+
+/* Немного уменьшаем отступы у дополнительных элементов */
 .ghx-extra-fields,
-.ghx-flags,
-.ghx-avatar {
+.ghx-flags {
     margin-top: 2px !important;
 }
