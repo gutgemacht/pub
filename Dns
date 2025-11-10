@@ -1,24 +1,70 @@
----
-- name: Create a self-signed certificate on Windows
-  hosts: windows
-  gather_facts: no
-  tasks:
+#!/bin/bash
 
-    - name: Generate self-signed certificate
-      win_shell: |
-        $cert = New-SelfSignedCertificate -DnsName "your.domain.com" -CertStoreLocation "Cert:\LocalMachine\My"
-        $pwd = ConvertTo-SecureString -String "P@ssw0rd!" -Force -AsPlainText
-        Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "C:\Certificates\your_cert.pfx" -Password $pwd
-      args:
-        executable: powershell
+sybase_shutdown_remote() {
+    local HOSTNAME="$1"
+    local SID="$2"
+    local SYBASE_USER="$3"
+    local EXIT_CODE
 
-    - name: Ensure certificate directory exists
-      win_file:
-        path: C:\Certificates
-        state: directory
+    echo "--- Starting Remote Sybase Shutdown ---"
+    echo "Host: $HOSTNAME | SID: $SID | User: $SYBASE_USER"
+    echo "------------------------------------------------"
 
-    - name: Fetch certificate from Windows to Ansible control node
-      fetch:
-        src: C:\Certificates\your_cert.pfx
-        dest: ./your_cert.pfx
-        flat: yes
+    # 1. Constructing commands for remote execution
+    # Commands are separated by a semicolon for sequential execution
+    local SHUTDOWN_COMMANDS=$(cat <<EOF
+source /sybase/$SID/$SYBASE_USER.csh;
+# Note: The -X key in isql might vary in different versions
+echo "Starting ISQL command execution...";
+isql -Usapsa -S$SID -w160 -X <<EOSQL
+shutdown SYB_BACKUP
+go
+shutdown
+go
+EOSQL
+echo "ISQL command finished."
+EOF
+    )
+
+    # 2. Constructing the full SSH string (sudo -> su - <user> -> commands)
+    # Using cat <<EOF | ssh ... 'bash -s' for safe multi-line script transfer.
+    # This is the most reliable way to avoid quoting/escaping issues.
+    local FULL_REMOTE_SCRIPT=$(cat <<EOF_SCRIPT
+# Internal script for remote execution
+sudo -i <<EOF_SUDO
+    echo "☑️ ROOT Connection: Successful (sudo -i)"
+    su - $SYBASE_USER -c "
+        echo \"☑️ User Switch: Successful (su - $SYBASE_USER)\"
+        
+        # Execute Sybase commands, suppressing stderr to avoid noise.
+        bash -c \"
+            $SHUTDOWN_COMMANDS
+        \" 2>/dev/null
+    "
+EOF_SUDO
+EOF_SCRIPT
+    )
+
+    # 3. Executing SSH and checking connection status
+    echo -e "💬 Attempting connection to $HOSTNAME and execution:\n"
+    
+    # Use 'bash -s' to execute the script passed via stdin
+    echo "$FULL_REMOTE_SCRIPT" | ssh "$HOSTNAME" 'bash -s'
+    EXIT_CODE=$?
+
+    # 4. Analyzing SSH exit code
+    if [ $EXIT_CODE -eq 0 ]; then
+        echo "------------------------------------------------"
+        echo "✅ SYSTEM SHUTDOWN $SID: Completed successfully (Exit Code 0). Check remote logs!"
+    elif [ $EXIT_CODE -eq 1 ]; then
+        echo "------------------------------------------------"
+        echo "⚠️ SYSTEM SHUTDOWN $SID: Completed, but with errors (Exit Code 1). Check remote logs!"
+    else
+        echo "------------------------------------------------"
+        echo "❌ SSH CONNECTION: FAILED! (Exit Code $EXIT_CODE)"
+        echo "   Could not connect to $HOSTNAME. Check hostname or SSH keys."
+        return 1
+    fi
+}
+# --- Example usage (uncomment for testing) ---
+# sybase_shutdown_remote "user@1x1sap07" "BOS" "sybbos"
