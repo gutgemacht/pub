@@ -1,0 +1,45 @@
+#!/bin/bash
+
+check_ps() {
+    local SID="$1"
+    local HOSTNAME="$2"
+    local INSTANCE="$3"
+    local PROCESS_NAME="$4"
+    local ADM_USER="$5" # Теперь это явный параметр $5
+
+    echo "--- Запуск проверки процесса ---"
+    echo "SID: $SID | Хост: $HOSTNAME | Инстанс: $INSTANCE | Процесс: $PROCESS_NAME | Пользователь: $ADM_USER"
+
+    local FIRST_CHAR=$(echo "$PROCESS_NAME" | cut -c 1)
+    local REST_OF_NAME=$(echo "$PROCESS_NAME" | cut -c 2-)
+    local PROCESS_NAME_ESCAPED="[$FIRST_CHAR]$REST_OF_NAME"
+    
+    # Команда для удаленного выполнения
+    # Она будет запускаться как: ssh user@hostname 'sudo su - -c "su - adm_user -c \"ps -ef | grep -q '\[t\]omcat'\""'
+    local REMOTE_COMMAND="sudo su - -c 'su - $ADM_USER -c \"ps -ef | grep -q \\'$PROCESS_NAME_ESCAPED\\'\"'"
+
+    ssh -q "$HOSTNAME" "$REMOTE_COMMAND"
+    local SSH_EXIT_STATUS=$?
+
+    if [ $SSH_EXIT_STATUS -eq 0 ]; then
+        echo ""
+        echo "☑️ SSH-соединение: Успешно (Connection successful)"
+        echo "✅ РЕЗУЛЬТАТ: Процесс '$PROCESS_NAME' (инстанс '$INSTANCE') НАЙДЕН под пользователем '$ADM_USER' на хосте '$HOSTNAME'."
+    elif [ $SSH_EXIT_STATUS -eq 1 ]; then
+        echo ""
+        echo "☑️ SSH-соединение: Успешно (Connection successful)"
+        echo "❌ РЕЗУЛЬТАТ: Процесс '$PROCESS_NAME' (инстанс '$INSTANCE') НЕ НАЙДЕН под пользователем '$ADM_USER' на хосте '$HOSTNAME'."
+        echo "   ВНИМАНИЕ: Сервис '$SID-$INSTANCE', вероятно, остановлен. Проверьте логи."
+    else
+        echo ""
+        echo "❌ SSH-соединение: ОШИБКА! (Connection failed, exit code $SSH_EXIT_STATUS)"
+        echo "   Не удалось подключиться к '$HOSTNAME'. Проверьте имя хоста, пользователя или настройки SSH-ключа."
+        exit 1 # Выход из скрипта при ошибке подключения
+    fi
+    echo "------------------------------------------------"
+}
+
+# Пример использования (теперь нужен 5-й параметр для OS-username)
+# check_ps "BOS" "your_remote_host.com" "web2" "tomcat" "bosadm"
+
+exit
