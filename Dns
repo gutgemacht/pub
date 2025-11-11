@@ -1,106 +1,101 @@
 #!/bin/bash
-#
-# sybase_shutdown_remote() - Remotely shuts down a Sybase/SAP ASE instance.
-#
-# Usage Example: sybase_shutdown_remote <HOSTNAME> <SID> <SYBASE_USER> <SYBASE_PASSWORD>
-#
-sybase_shutdown_remote() {
-    # ----------------------------------------------------------------------
-    # 1. Variable Initialization and Input Validation
-    # ----------------------------------------------------------------------
-    if [ "$#" -ne 4 ]; then
-        echo "ERROR: Incorrect number of arguments supplied."
-        echo "Usage: $0 <HOSTNAME> <SID> <SYBASE_USER> <SYBASE_PASSWORD>"
-        return 1
-    fi
 
+sybase_startup_remote() {
     local HOSTNAME="$1"
     local SID="$2"
-    local SYBASE_USER="$3" # e.g., sybbos
-    local SYBASE_PWD="$4"  # The isql password (e.g., sapsapsa's password)
-    local EXIT_CODE=0
+    local SYBASE_USER="$3"
+    local SERVICE_SCRIPT="$4"
+    local EXIT_CODE
 
-    echo "--- Starting Remote Sybase Shutdown ---"
+    echo "--- Starting Remote Sybase Services ---"
     echo "Host: $HOSTNAME | SID: $SID | User: $SYBASE_USER"
+    echo "------------------------------------------------"
 
-    # ----------------------------------------------------------------------
-    # 2. Constructing the Shutdown Commands (Executed as $SYBASE_USER)
-    # ----------------------------------------------------------------------
-    # Commands are separated by a semicolon for sequential execution.
-    # NOTE: Assumes a Bash-compatible environment file (.sh) on the remote host.
-    # If only .csh exists, you must manually convert environment settings.
+    # 1. Constructing commands for remote execution
+    # Corrected: Escaped parentheses in echo statements.
+    local STARTUP_COMMANDS=$(cat <<EOF
+# Execute external service script first
+echo "Running service script: $SERVICE_SCRIPT...";
+$SERVICE_SCRIPT -s $SID -t db -a istart;
 
-    local SHUTDOWN_COMMANDS=$(cat << EOF_CMDS
-# Source the environment (Change .sh to .csh if needed, but be careful with shell compatibility)
-source /sybase/\$SID/SYB/SYBASE.sh;
-# Execute shutdown command using isql. Added -P flag for password.
-# WARNING: Storing password in a variable is a security risk.
-echo "Starting isql command execution...";
-isql -Usapsapsa -P'$SYBASE_PWD' -S\$SID -w160 -X <<EOSQL
-shutdown SYB_BACKUP
+# Source Sybase environment
+source /sybase/$SID/SYBASE.csh;
+echo "Environment sourced: /sybase/$SID/SYBASE.csh";
+
+# Start primary server
+/sybase/BOS/ASE-16_0/bin/startserver -f /sybase/BOS/ASE-16_0/install/RUN_BOS;
+echo "Primary server \(RUN_BOS\) command executed."; # <-- ESCAPED PARENTHESES
+
+# Start backup server
+/sybase/BOS/ASE-16_0/bin/startserver -f /sybase/BOS/ASE-16_0/install/RUN_BOS_BS;
+echo "Backup server \(RUN_BOS_BS\) command executed."; # <-- ESCAPED PARENTHESES
+
+# Check SQL connection
+echo "Checking SQL connection...";
+isql -Usapsa -S$SID -w160 -X <<EOSQL
+select @@servername
 go
-shutdown
-go
+quit
 EOSQL
-# Check isql exit code for success
+# Check the isql connection exit code
 if [ \$? -ne 0 ]; then
-    echo "ERROR: isql shutdown command failed (Check logs for details)."
+    echo "ERROR: SQL connection check failed!"
     exit 1
 fi
-echo "isql command finished.";
-exit 0
-EOF_CMDS
-)
+echo "SQL connection check finished."
+EOF
+    )
+    
+    # 2. Constructing the full SSH string (FIXED: Simplified su - execution)
+    # Define a temporary variable for clean substitution
+    local SYBASE_COMMANDS="$STARTUP_COMMANDS"
 
-    # ----------------------------------------------------------------------
-    # 3. Constructing the Full Remote Script (Executed as root via SSH)
-    # ----------------------------------------------------------------------
-    # This structure uses a clean user switch (su -) to avoid quoting hell.
+    # Use single quotes around EOF_SCRIPT to preserve the dollar signs until substitution
     local FULL_REMOTE_SCRIPT=$(cat << 'EOF_SCRIPT'
-# ROOT connection: Successful
-su - $SYBASE_USER << EOF_SU
-# User switch: Successful (su - $SYBASE_USER)
-# Execute the shutdown commands in the new shell environment
-$SHUTDOWN_COMMANDS
+# The remote execution is started as root via 'sudo bash -s'
+echo "☑️ ROOT Connection: Successful"
+
+# Use 'su -' fed by a Heredoc for clean user switch and command execution
+su - $SYBASE_USER << 'EOF_SU'
+echo "☑️ User Switch: Successful (su - $SYBASE_USER)"
+
+# Execute the commands defined in $STARTUP_COMMANDS
+$SYBASE_COMMANDS
+
 EOF_SU
-# The exit code of the 'su' command determines the overall exit of the script
+
+# Pass the exit code of the 'su' command back to the SSH session
 exit $?
 EOF_SCRIPT
-)
+    )
 
-    # Substitute variables in the FULL_REMOTE_SCRIPT
+    # Substitute the variables into the FULL_REMOTE_SCRIPT AFTER definition
     FULL_REMOTE_SCRIPT="${FULL_REMOTE_SCRIPT//\$SYBASE_USER/$SYBASE_USER}"
-    FULL_REMOTE_SCRIPT="${FULL_REMOTE_SCRIPT//\$SHUTDOWN_COMMANDS/$SHUTDOWN_COMMANDS}"
+    FULL_REMOTE_SCRIPT="${FULL_REMOTE_SCRIPT//\$SYBASE_COMMANDS/$SYBASE_COMMANDS}"
 
-    # ----------------------------------------------------------------------
-    # 4. Executing SSH and checking connection status
-    # ----------------------------------------------------------------------
-    echo -e "\n# Attempting connection to $HOSTNAME and execution:"
+
+    # 3. Executing SSH and checking connection status
+    echo -e "\n💬 Attempting connection to $HOSTNAME and starting services:"
     
-    # Execute the script remotely via SSH, running as root on the other end
-    # The 'bash -s' reads the script from STDIN (the heredoc)
-    ssh "$HOSTNAME" "sudo bash -s" <<< "$FULL_REMOTE_SCRIPT"
-
+    # Using '<<< "$FULL_REMOTE_SCRIPT"' is cleaner than piping with 'echo'
+    # The 'sudo' is implicitly executed if needed, but we rely on SSH keys for login
+    # If the user is logging in as root, remove 'sudo' from the command.
+    ssh "$HOSTNAME" "sudo bash -s" <<< "$FULL_REMOTE_SCRIPT" 
     EXIT_CODE=$?
 
-    # ----------------------------------------------------------------------
-    # 5. Analyzing SSH exit code
-    # ----------------------------------------------------------------------
+    # 4. Analyzing SSH exit code
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "SYSTEM SHUTDOWN $SID: Completed successfully (Exit Code 0). Check remote logs."
+        echo "------------------------------------------------"
+        echo "✅ SYSTEM STARTUP $SID: Execution completed (Exit Code 0). Check remote logs for service status!"
     elif [ $EXIT_CODE -eq 1 ]; then
-        echo "SYSTEM SHUTDOWN $SID: Completed, but with errors (Exit Code 1). Check remote logs!"
-        # Return 1 to indicate a command failure, though SSH succeeded
-        return 1
-    elif [ $EXIT_CODE -eq 255 ]; then
-        echo "SSH CONNECTION: FAILED! (Exit Code 255). Could not connect to $HOSTNAME. Check hostname, network, or SSH keys."
-        # Return 255 to distinguish from command failure
-        return 255
+        echo "------------------------------------------------"
+        echo "⚠️ SYSTEM STARTUP $SID: Completed with potential errors (Exit Code 1). Check remote logs!"
     else
-        echo "SSH CONNECTION: FAILED! (Exit Code $EXIT_CODE). Unknown error. Check logs."
-        return $EXIT_CODE
+        echo "------------------------------------------------"
+        echo "❌ SSH CONNECTION: FAILED! (Exit Code $EXIT_CODE)"
+        echo "   Could not connect to $HOSTNAME. Check hostname or SSH keys."
+        return 1
     fi
 }
-
-# --- Example usage (uncomment for testing, ensure four arguments are passed) ---
-# sybase_shutdown_remote "rfxlsapt01" "SYB" "sybbos" "MySybasePassword123"
+# --- Example usage (uncomment for testing) ---
+# sybase_startup_remote "user@hostname" "BOS" "sybbos" "/path/to/ff_service.sh"
